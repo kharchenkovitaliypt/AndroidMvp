@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'org.jetbrains.dokka'
 
 group = artifactGroupId
 
@@ -36,4 +37,25 @@ dependencies {
 //        exclude group: 'com.android.support', module: 'support-annotations'
 //    })
 //    testCompile 'junit:junit:4.12'
+}
+
+//task generateJavadocs(type: Javadoc) {
+//    source = android.sourceSets.main.java.srcDirs
+//    classpath += project.files(android.getBootClasspath()
+//            .join(File.pathSeparator))
+//}
+//task generateJavadocsJar(type: Jar) {
+//    from generateJavadocs.destinationDir
+//    classifier 'javadoc'
+//}
+//generateJavadocsJar.dependsOn generateJavadocs
+
+task generateSourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier 'sources'
+}
+
+artifacts {
+    //archives generateJavadocsJar
+    archives generateSourcesJar
 }
