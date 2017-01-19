@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:textSize="24sp"
+        android:freezesText="true"
         android:id="@+id/result"/>
 
     <EditText
