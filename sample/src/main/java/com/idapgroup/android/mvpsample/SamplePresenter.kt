@@ -20,10 +20,12 @@ class SamplePresenter : SampleMvp.Presenter, BaseRxPresenter<SampleMvp.View>() {
                 .compose(taskTracker("task_confirm"))
                 .subscribe(
                         {
-                            view!!.hideLoad()
-                            view!!.goToMain()
+                            execute {
+                                view!!.hideLoad()
+                                view!!.goToMain()
+                            }
                         },
-                        { view!!.showError(it) }
+                        { execute { view!!.showError(it) } }
                 )
     }
 

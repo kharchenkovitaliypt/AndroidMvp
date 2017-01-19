@@ -2,7 +2,7 @@
 <resources>
     <item type="id" name="progress" />
     <item type="id" name="content" />
-    <item type="id" name="error_container" />
-    <item type="id" name="error_message" />
-    <item type="id" name="error_retry" />
+    <item type="id" name="errorContainer" />
+    <item type="id" name="errorMessage" />
+    <item type="id" name="errorRetry" />
 </resources>

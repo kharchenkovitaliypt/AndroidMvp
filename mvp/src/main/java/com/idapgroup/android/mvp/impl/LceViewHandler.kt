@@ -26,9 +26,9 @@ class LceViewHandler(view: View) : LceView {
     fun initView(rootView: View) {
         progressView = rootView.findViewById(R.id.progress)
         contentView = rootView.findViewById(R.id.content) as ViewGroup?
-        errorContainerView = rootView.findViewById(R.id.error_container)
-        errorMessageView = rootView.findViewById(R.id.error_message) as TextView?
-        errorRetryView = rootView.findViewById(R.id.error_retry)
+        errorContainerView = rootView.findViewById(R.id.errorContainer)
+        errorMessageView = rootView.findViewById(R.id.errorMessage) as TextView?
+        errorRetryView = rootView.findViewById(R.id.errorRetry)
         // Set default state
         showContent()
     }
