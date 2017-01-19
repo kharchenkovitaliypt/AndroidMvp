@@ -20,5 +20,16 @@ class MainActivity : AppCompatActivity() {
                     .addToBackStack(null)
                     .commit()
         }
+
+        findViewById(R.id.lce_activity_based).setOnClickListener {
+            startActivity(Intent(this, SampleLceActivity::class.java))
+        }
+
+        findViewById(R.id.lce_fragment_based).setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                    .add(R.id.container, SampleLceFragment())
+                    .addToBackStack(null)
+                    .commit()
+        }
     }
 }

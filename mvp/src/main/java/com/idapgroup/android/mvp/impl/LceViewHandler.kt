@@ -1,15 +1,25 @@
 package com.idapgroup.android.rx_mvp.load
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
 import com.idapgroup.android.mvp.LceView
 import com.idapgroup.android.mvp.R
 
-class LceViewHandler(view: View) : LceView {
+class LceViewHandler : LceView {
 
-    var progressView: View? = null
+    interface LceComponentViewCreator {
+        fun onCreateLoadView(inflater: LayoutInflater, container: ViewGroup) : View
+        fun onCreateErrorView(inflater: LayoutInflater, container: ViewGroup) : View
+        fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
+    }
+
+    companion object {
+        val BASE_CONTAINER_ID = R.layout.lce_base_container
+    }
+
+    var loadView: View? = null
         private set
     var contentView: ViewGroup? = null
         private set
@@ -19,22 +29,53 @@ class LceViewHandler(view: View) : LceView {
         private set
     var errorRetryView: View? = null
 
-    init {
-        initView(view)
+    fun createAndInitView(inflater: LayoutInflater, rootContainer: ViewGroup?, creator: LceComponentViewCreator): View {
+        var container = inflater.inflate(BASE_CONTAINER_ID, rootContainer, false)
+        return initView(inflater, container as ViewGroup, creator)
     }
 
-    fun initView(rootView: View) {
-        progressView = rootView.findViewById(R.id.progress)
+    fun initView(inflater: LayoutInflater, container: ViewGroup, creator: LceComponentViewCreator): View {
+        val childCount = container.childCount
+        return container.apply {
+            // Load
+            addView(creator.onCreateLoadView(inflater, this).apply {
+                id = R.id.load
+            })
+            checkContainerState(this, childCount + 1, "onCreateLoadView")
+            // Error
+            addView(creator.onCreateErrorView(inflater, this).apply {
+                id = R.id.errorContainer
+            })
+            checkContainerState(this, childCount + 2, "onCreateErrorView")
+            // Content
+            addView(creator.onCreateContentView(inflater, this).apply {
+                id = R.id.content
+            })
+            checkContainerState(this, childCount + 3, "onCreateContentView")
+
+            initView(this)
+        }
+    }
+
+    fun checkContainerState(container: ViewGroup, requisiteChildCount: Int, name: String) {
+        if(container.childCount != requisiteChildCount) {
+            throw IllegalStateException("'$name()' modified container child view set")
+        }
+    }
+
+    fun initView(rootView: View) : View {
+        loadView = rootView.findViewById(R.id.load)
         contentView = rootView.findViewById(R.id.content) as ViewGroup?
         errorContainerView = rootView.findViewById(R.id.errorContainer)
         errorMessageView = rootView.findViewById(R.id.errorMessage) as TextView?
         errorRetryView = rootView.findViewById(R.id.errorRetry)
         // Set default state
         showContent()
+        return rootView
     }
 
     fun resetView() {
-        progressView = null
+        loadView = null
         contentView = null
         errorContainerView = null
         errorMessageView = null
@@ -44,7 +85,7 @@ class LceViewHandler(view: View) : LceView {
     /** Show loading view  */
     override fun showLoad() {
         hideAll()
-        progressView!!.visibility = View.VISIBLE
+        loadView!!.visibility = View.VISIBLE
     }
 
     /** Show base contentView container  */
@@ -65,7 +106,7 @@ class LceViewHandler(view: View) : LceView {
     }
 
     private fun hideAll() {
-        progressView!!.visibility = View.GONE
+        loadView!!.visibility = View.GONE
         contentView!!.visibility = View.GONE
         errorContainerView?.visibility = View.GONE
     }

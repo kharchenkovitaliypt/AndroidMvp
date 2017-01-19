@@ -5,7 +5,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class SamplePresenter : SampleMvp.Presenter, BaseRxPresenter<SampleMvp.View>() {
+open class SamplePresenter : SampleMvp.Presenter, BaseRxPresenter<SampleMvp.View>() {
 
     init {
         setResetTaskStateAction("task_confirm", { view!!.hideLoad() })

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item type="id" name="progress" />
+    <item type="id" name="load" />
     <item type="id" name="content" />
     <item type="id" name="errorContainer" />
     <item type="id" name="errorMessage" />

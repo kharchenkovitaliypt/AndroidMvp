@@ -4,7 +4,7 @@ import android.os.Bundle
 
 abstract class BasePresenter<V> : MvpPresenter<V> {
 
-    var view : V? = null
+    open var view : V? = null
 
     final override fun attachView(view: V) {
         this.view = view

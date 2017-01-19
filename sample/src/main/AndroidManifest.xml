@@ -16,9 +16,14 @@
 
         <activity
             android:name=".SampleActivity"
-            android:label="Activity based"
-            android:theme="@style/AppTheme">
-        </activity>
+            android:label="Presenter activity"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".SampleLceActivity"
+            android:label="Presenter LCE activity"
+            android:theme="@style/AppTheme" />
+
     </application>
 
 </manifest>
