@@ -6,7 +6,7 @@ import android.util.SparseArray
 import java.util.*
 
 /** Temporary preserves [PresenterDelegate]s when activity configuration changing(recreating) */
-internal val tmpPresenterDelegatesStorage = LinkedHashMap<String, PresenterDelegate<*, *>>()
+val tmpPresenterDelegatesStorage = LinkedHashMap<String, PresenterDelegate<*, *>>()
 
 abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
     val KEY_FRAGMENT_ID = "fragment_id"
@@ -20,7 +20,8 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
      */
     abstract fun createPresenter(): P
 
-    val presenter = presenterDelegate.presenter
+    val presenter: P
+        get() = presenterDelegate.presenter
 
     /** Override in case of activity not implementing Presenter<View> interface <View> */
     @Suppress("UNCHECKED_CAST")
@@ -64,5 +65,5 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
      * Override if at the same time may exist many examples of the same class.
      * May be unique only for this class of fragment not required global uniqueness
      * */
-    protected fun getFragmentId() : String = hashCode().toString()
+    protected open fun getFragmentId() : String = hashCode().toString()
 }

@@ -21,9 +21,9 @@ class SampleFragment : SampleMvp.View, BasePresenterFragment<SampleMvp.View, Sam
 
         view.findViewById(R.id.ask).setOnClickListener {
             val question = (view.findViewById(R.id.question) as TextView).text
-            getPresenter().onAsk(question.toString())
+            presenter.onAsk(question.toString())
         }
-        view.findViewById(R.id.confirm).setOnClickListener { getPresenter().onConfirm() }
+        view.findViewById(R.id.confirm).setOnClickListener { presenter.onConfirm() }
     }
 
     override fun goToMain() {
