@@ -46,6 +46,8 @@ class SampleActivity : BasePresenterActivity<SampleMvp.View, SampleMvp.Presenter
         val loadDialog = ProgressDialog(this)
         loadDialog.setMessage("Processing...")
         loadDialog.isIndeterminate = true
+        loadDialog.setCancelable(false)
+        loadDialog.setCanceledOnTouchOutside(false)
         loadDialog.show()
         this.loadDialog = loadDialog
     }
