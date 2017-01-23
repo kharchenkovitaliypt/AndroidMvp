@@ -3,9 +3,10 @@ package com.idapgroup.android.mvp
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.SparseArray
+import java.util.*
 
 /** Temporary preserves [PresenterDelegate]s when activity configuration changing(recreating) */
-private val tmpPresenterDelegatesStorage = SparseArray<PresenterDelegate<*, *>>()
+internal val tmpPresenterDelegatesStorage = LinkedHashMap<String, PresenterDelegate<*, *>>()
 
 abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
     val KEY_FRAGMENT_ID = "fragment_id"
@@ -19,7 +20,7 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
      */
     abstract fun createPresenter(): P
 
-    fun getPresenter() = presenterDelegate.presenter
+    val presenter = presenterDelegate.presenter
 
     /** Override in case of activity not implementing Presenter<View> interface <View> */
     @Suppress("UNCHECKED_CAST")
@@ -29,14 +30,14 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if(savedInstanceState == null || tmpPresenterDelegatesStorage.size() == 0) {
+        if(savedInstanceState == null || tmpPresenterDelegatesStorage.size == 0) {
             presenterDelegate = PresenterDelegate(createPresenter())
         } else {
             // Restore previously preserved presenter when configuration change
-            val fragmentId = savedInstanceState.getInt(KEY_FRAGMENT_ID)
+            val fragmentId = savedInstanceState.getString(KEY_FRAGMENT_ID)
             @Suppress("UNCHECKED_CAST")
-            presenterDelegate = tmpPresenterDelegatesStorage.get(fragmentId) as PresenterDelegate<V, P>
-            tmpPresenterDelegatesStorage.delete(fragmentId)
+            presenterDelegate = tmpPresenterDelegatesStorage[fragmentId] as PresenterDelegate<V, P>
+            tmpPresenterDelegatesStorage.remove(fragmentId)
         }
     }
 
@@ -44,8 +45,9 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
         super.onSaveInstanceState(savedState)
         presenterDelegate.onSaveState(savedState)
         // Tmp preserve presenter when configuration change
-        savedState.putInt(KEY_FRAGMENT_ID, getFragmentId())
-        tmpPresenterDelegatesStorage.append(getFragmentId(), presenterDelegate)
+        val fragmentId = javaClass.name + getFragmentId()
+        savedState.putString(KEY_FRAGMENT_ID, fragmentId)
+        tmpPresenterDelegatesStorage.put(fragmentId, presenterDelegate)
     }
 
     override fun onResume() {
@@ -58,5 +60,9 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
         super.onPause()
     }
 
-    private fun getFragmentId() : Int = hashCode()
+    /**
+     * Override if at the same time may exist many examples of the same class.
+     * May be unique only for this class of fragment not required global uniqueness
+     * */
+    protected fun getFragmentId() : String = hashCode().toString()
 }
