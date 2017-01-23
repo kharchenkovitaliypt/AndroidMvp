@@ -18,7 +18,7 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
      * This instance should not contain explicit or implicit reference for [android.app.Activity] context
      * since it will be keep on rotations.
      */
-    abstract fun createPresenter(): P
+    abstract fun onCreatePresenter(): P
 
     val presenter: P
         get() = presenterDelegate.presenter
@@ -32,7 +32,7 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
         super.onCreate(savedInstanceState)
 
         if(savedInstanceState == null || tmpPresenterDelegatesStorage.size == 0) {
-            presenterDelegate = PresenterDelegate(createPresenter())
+            presenterDelegate = PresenterDelegate(onCreatePresenter())
         } else {
             // Restore previously preserved presenter when configuration change
             val fragmentId = savedInstanceState.getString(KEY_FRAGMENT_ID)

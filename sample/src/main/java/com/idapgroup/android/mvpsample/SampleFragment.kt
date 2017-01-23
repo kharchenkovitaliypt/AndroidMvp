@@ -10,7 +10,7 @@ import com.idapgroup.android.mvp.BasePresenterFragment
 
 class SampleFragment : SampleMvp.View, BasePresenterFragment<SampleMvp.View, SampleMvp.Presenter>() {
 
-    override fun createPresenter() = SamplePresenter()
+    override fun onCreatePresenter() = SamplePresenter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.screen_sample, container, false)
