@@ -1,6 +1,7 @@
 package com.idapgroup.android.mvp
 
 import android.os.Bundle
+import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
 
 abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActivity() {
@@ -21,6 +22,7 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
     open val presenterView: V
         get() = this as V
 
+    @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,20 +36,24 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
         }
     }
 
+    @CallSuper
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         presenterDelegate.onSaveState(outState)
     }
 
+    @CallSuper
     override fun onRetainCustomNonConfigurationInstance(): Any {
         return presenterDelegate
     }
 
+    @CallSuper
     override fun onResume() {
         super.onResume()
         presenterDelegate.attachView(presenterView)
     }
 
+    @CallSuper
     override fun onPause() {
         presenterDelegate.detachView()
         super.onPause()

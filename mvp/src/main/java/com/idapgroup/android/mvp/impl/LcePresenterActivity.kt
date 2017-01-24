@@ -1,6 +1,7 @@
 package com.idapgroup.android.mvp.impl
 
 import android.os.Bundle
+import android.support.annotation.CallSuper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,7 @@ abstract class LcePresenterActivity<V, out P : MvpPresenter<V>> :
         return inflater.inflate(R.layout.lce_base_load, container, false)
     }
 
+    @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         super.setContentView(LceViewHandler.BASE_CONTAINER_ID)

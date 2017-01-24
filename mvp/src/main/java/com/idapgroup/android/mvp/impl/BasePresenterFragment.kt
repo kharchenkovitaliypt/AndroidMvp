@@ -1,6 +1,7 @@
 package com.idapgroup.android.mvp
 
 import android.os.Bundle
+import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
 import android.util.SparseArray
 import java.util.*
@@ -28,6 +29,7 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
     open val presenterView: V
         get() = this as V
 
+    @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -42,6 +44,7 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
         }
     }
 
+    @CallSuper
     override fun onSaveInstanceState(savedState: Bundle) {
         super.onSaveInstanceState(savedState)
         presenterDelegate.onSaveState(savedState)
@@ -51,11 +54,13 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
         tmpPresenterDelegatesStorage.put(fragmentId, presenterDelegate)
     }
 
+    @CallSuper
     override fun onResume() {
         super.onResume()
         presenterDelegate.attachView(presenterView)
     }
 
+    @CallSuper
     override fun onPause() {
         presenterDelegate.detachView()
         super.onPause()

@@ -1,6 +1,7 @@
 package com.idapgroup.android.mvp.impl
 
 import android.os.Bundle
+import android.support.annotation.CallSuper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ abstract class LcePresenterFragment<V, out P : MvpPresenter<V>> :
         return lceViewHandler.createAndInitView(inflater, rootContainer, this)
     }
 
+    @CallSuper
     override fun onDestroyView() {
         super.onDestroyView()
         lceViewHandler.resetView()
