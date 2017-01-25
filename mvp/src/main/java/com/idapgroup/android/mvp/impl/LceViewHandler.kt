@@ -21,7 +21,7 @@ class LceViewHandler : LceView {
 
     var loadView: View? = null
         private set
-    var contentView: ViewGroup? = null
+    var contentView: View? = null
         private set
     var errorContainerView: View? = null
         private set
@@ -38,22 +38,21 @@ class LceViewHandler : LceView {
         val childCount = container.childCount
         return container.apply {
             // Load
-            addView(creator.onCreateLoadView(inflater, this).apply {
-                id = R.id.load
-            })
+            loadView = creator.onCreateLoadView(inflater, this)
+            addView(loadView)
             checkContainerState(this, childCount + 1, "onCreateLoadView")
             // Error
-            addView(creator.onCreateErrorView(inflater, this).apply {
-                id = R.id.errorContainer
-            })
+            errorContainerView = creator.onCreateErrorView(inflater, this)
+            errorMessageView = errorContainerView!!.findViewById(R.id.errorMessage) as TextView?
+            errorRetryView = errorContainerView!!.findViewById(R.id.errorRetry)
+            addView(errorContainerView)
             checkContainerState(this, childCount + 2, "onCreateErrorView")
             // Content
-            addView(creator.onCreateContentView(inflater, this).apply {
-                id = R.id.content
-            })
+            contentView = creator.onCreateContentView(inflater, this)
+            addView(contentView)
             checkContainerState(this, childCount + 3, "onCreateContentView")
-
-            initView(this)
+            // Set default state
+            showContent()
         }
     }
 
