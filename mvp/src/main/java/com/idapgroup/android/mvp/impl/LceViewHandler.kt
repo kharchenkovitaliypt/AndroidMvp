@@ -7,13 +7,30 @@ import android.widget.TextView
 import com.idapgroup.android.mvp.LceView
 import com.idapgroup.android.mvp.R
 
-class LceViewHandler : LceView {
+interface LceComponentViewCreator {
+    fun onCreateLoadView(inflater: LayoutInflater, container: ViewGroup) : View
+    fun onCreateErrorView(inflater: LayoutInflater, container: ViewGroup) : View
+    fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
+}
 
-    interface LceComponentViewCreator {
-        fun onCreateLoadView(inflater: LayoutInflater, container: ViewGroup) : View
-        fun onCreateErrorView(inflater: LayoutInflater, container: ViewGroup) : View
-        fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
+class DefaultLceComponentViewCreator
+(val contentViewCreator: ((inflater: LayoutInflater, container: ViewGroup) -> View)? = null)
+    : LceComponentViewCreator {
+
+    override fun onCreateErrorView(inflater: LayoutInflater, container: ViewGroup) : View {
+        return inflater.inflate(R.layout.lce_base_error, container, false)
     }
+
+    override fun onCreateLoadView(inflater: LayoutInflater, container: ViewGroup) : View {
+        return inflater.inflate(R.layout.lce_base_load, container, false)
+    }
+
+    override fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View {
+        return contentViewCreator!!.invoke(inflater, container)
+    }
+}
+
+class LceViewHandler : LceView {
 
     companion object {
         val BASE_CONTAINER_ID = R.layout.lce_base_container

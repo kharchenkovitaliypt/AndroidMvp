@@ -6,30 +6,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.idapgroup.android.mvp.*
+import com.idapgroup.android.rx_mvp.load.DefaultLceComponentViewCreator
 
 import com.idapgroup.android.rx_mvp.load.LceViewHandler
 
 /** Fragment for displaying loading states(load, content, error)  */
 abstract class LcePresenterActivity<V, out P : MvpPresenter<V>> :
         BasePresenterActivity<V, P>(),
-        LceView,
-        LceViewHandler.LceComponentViewCreator {
+        LceView {
 
     private var lceViewHandler = LceViewHandler()
+    private val defaultLceComponentViewCreator = DefaultLceComponentViewCreator(
+        { inflater, container ->
+            onCreateContentView(inflater, container)
+        }
+    )
 
-    override fun onCreateErrorView(inflater: LayoutInflater, container: ViewGroup) : View {
-        return inflater.inflate(R.layout.lce_base_error, container, false)
-    }
-
-    override fun onCreateLoadView(inflater: LayoutInflater, container: ViewGroup) : View {
-        return inflater.inflate(R.layout.lce_base_load, container, false)
-    }
+    abstract fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         super.setContentView(LceViewHandler.BASE_CONTAINER_ID)
-        lceViewHandler.initView(layoutInflater, findViewById(R.id.lce_container) as ViewGroup, this)
+        val lceContainer = findViewById(R.id.lce_container) as ViewGroup
+        lceViewHandler.initView(layoutInflater, lceContainer, defaultLceComponentViewCreator)
     }
 
     override fun setContentView(layoutResID: Int) {
