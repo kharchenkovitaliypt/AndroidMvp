@@ -1,6 +1,8 @@
 package com.idapgroup.android.rx_mvp
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.support.annotation.CallSuper
 import android.util.Log
 import com.idapgroup.android.mvp.BasePresenter
@@ -12,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 open class BaseRxPresenter<V> : BasePresenter<V>() {
 
+    private val handler = Handler(Looper.getMainLooper())
     private val pendingActions = ArrayList<() -> Unit>()
     private val activeTasks = LinkedHashMap<String, Disposable>()
     private val resetTaskStateActionMap = ConcurrentHashMap<String, () -> Unit>()
@@ -98,10 +101,18 @@ open class BaseRxPresenter<V> : BasePresenter<V>() {
     /** Calls this action immediately if rootView attached
      * or postpone for the moment when rootView will be attached  */
     protected fun execute(action: () -> Unit) {
-        if (view != null) {
-            action()
-        } else {
-            pendingActions.add(action)
+        val executeAction = Runnable {
+            if (view != null) {
+                action()
+            } else {
+                pendingActions.add(action)
+            }
         }
+        if(Looper.myLooper() == Looper.getMainLooper()) {
+            executeAction.run()
+        } else {
+            handler.post(executeAction)
+        }
+
     }
 }
