@@ -2,7 +2,7 @@ package com.idapgroup.android.mvp
 
 import android.os.Bundle
 
-class PresenterDelegate<V, out P : MvpPresenter<V>>(val presenter : P) {
+class PresenterDelegate<in V, out P : MvpPresenter<V>>(val presenter : P) {
 
     var created = false
 
