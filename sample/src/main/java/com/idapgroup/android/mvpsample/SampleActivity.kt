@@ -18,9 +18,9 @@ class SampleActivity : BasePresenterActivity<SampleMvp.View, SampleMvp.Presenter
 
         findViewById(R.id.ask).setOnClickListener {
             val question = (findViewById(R.id.question) as TextView).text
-            getPresenter().onAsk(question.toString())
+            presenter.onAsk(question.toString())
         }
-        findViewById(R.id.confirm).setOnClickListener { getPresenter().onConfirm() }
+        findViewById(R.id.confirm).setOnClickListener { presenter.onConfirm() }
 
         if (savedInstanceState != null) {
             if(savedInstanceState.getBoolean("load_dialog_shown", false)) {

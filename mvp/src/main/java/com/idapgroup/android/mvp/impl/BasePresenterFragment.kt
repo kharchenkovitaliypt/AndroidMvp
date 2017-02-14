@@ -42,6 +42,7 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
             presenterDelegate = tmpPresenterDelegatesStorage[fragmentId] as PresenterDelegate<V, P>
             tmpPresenterDelegatesStorage.remove(fragmentId)
         }
+        presenterDelegate.onCreate()
     }
 
     @CallSuper

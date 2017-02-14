@@ -15,9 +15,9 @@ abstract class BasePresenter<V> : MvpPresenter<V> {
         this.view = null
     }
 
-    override fun onAttachedView(view: V) {}
-    override fun onDetachedView() {}
-    override fun onStart() { }
+    override fun onCreate() { }
     override fun onSaveState(savedState: Bundle) { }
     override fun onRestoreState(savedState: Bundle) { }
+    override fun onAttachedView(view: V) {}
+    override fun onDetachedView() {}
 }

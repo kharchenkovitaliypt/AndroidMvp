@@ -28,9 +28,9 @@ class SampleLceActivity : SampleLceMvp.View, LcePresenterActivity<SampleLceMvp.V
 
         findViewById(R.id.ask).setOnClickListener {
             val question = (findViewById(R.id.question) as TextView).text
-            getPresenter().onAsk(question.toString())
+            presenter.onAsk(question.toString())
         }
-        findViewById(R.id.confirm).setOnClickListener { getPresenter().onConfirm() }
+        findViewById(R.id.confirm).setOnClickListener { presenter.onConfirm() }
 
         if (savedInstanceState != null) {
             if(savedInstanceState.getBoolean("load_dialog_shown", false)) {
@@ -71,6 +71,6 @@ class SampleLceActivity : SampleLceMvp.View, LcePresenterActivity<SampleLceMvp.V
     }
 
     override fun showError(error: Throwable) {
-        super.showError(error.message ?: error.toString(), { getPresenter().onRetry() })
+        super.showError(error.message ?: error.toString(), { presenter.onRetry() })
     }
 }

@@ -8,7 +8,8 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
 
     private lateinit var presenterDelegate: PresenterDelegate<V, P>
 
-    fun getPresenter() = presenterDelegate.presenter
+    val presenter: P
+        get() = presenterDelegate.presenter
 
     /**
      * Creates a Presenter when needed.
@@ -34,6 +35,7 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
         if(savedInstanceState != null) {
             presenterDelegate.onRestoreState(savedInstanceState)
         }
+        presenterDelegate.onCreate()
     }
 
     @CallSuper

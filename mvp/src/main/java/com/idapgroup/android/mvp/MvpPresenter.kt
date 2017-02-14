@@ -9,8 +9,7 @@ interface MvpPresenter<in V> {
     fun onAttachedView(view: V)
     fun onDetachedView()
 
-    fun onStart()
-
+    fun onCreate()
     fun onSaveState(savedState: Bundle)
     fun onRestoreState(savedState: Bundle)
 }

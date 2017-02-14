@@ -9,10 +9,14 @@ import java.util.*
 class SampleLcePresenter : SampleLceMvp.Presenter, SamplePresenter() {
 
     init {
-        setResetTaskStateAction("task_start", { onStart() })
+        setResetTaskStateAction("task_start", { initContent() })
     }
 
-    override fun onStart() {
+    override fun onCreate() {
+        execute { initContent() }
+    }
+
+    fun initContent() {
         (view as SampleLceMvp.View).showLceLoad()
         Observable
                 .fromCallable {
@@ -33,6 +37,6 @@ class SampleLcePresenter : SampleLceMvp.Presenter, SamplePresenter() {
     }
 
     override fun onRetry() {
-        onStart()
+        initContent()
     }
 }
