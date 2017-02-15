@@ -1,4 +1,4 @@
-package com.idapgroup.android.rx_mvp
+package com.idapgroup.android.mvp.impl
 
 import android.content.Context
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutCompat
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import com.idapgroup.android.mvp.impl.ViewHandler
 
 open class ViewHandlerContainer : LinearLayoutCompat {
 
@@ -15,11 +16,11 @@ open class ViewHandlerContainer : LinearLayoutCompat {
     private var viewHandlerList: List<ViewHandler>? = null
 
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        orientation = LinearLayoutCompat.VERTICAL
+        orientation = VERTICAL
     }
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        orientation = LinearLayoutCompat.VERTICAL
+        orientation = VERTICAL
     }
 
     override fun onSaveInstanceState(): Parcelable {

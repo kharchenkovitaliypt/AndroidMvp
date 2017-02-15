@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import com.idapgroup.android.mvp.BasePresenterFragment
+import com.idapgroup.android.mvp.impl.BasePresenterFragment
 
 class SampleFragment : SampleMvp.View, BasePresenterFragment<SampleMvp.View, SampleMvp.Presenter>() {
 

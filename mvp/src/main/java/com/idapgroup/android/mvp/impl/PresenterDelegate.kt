@@ -1,6 +1,7 @@
-package com.idapgroup.android.mvp
+package com.idapgroup.android.mvp.impl
 
 import android.os.Bundle
+import com.idapgroup.android.mvp.MvpPresenter
 
 class PresenterDelegate<in V, out P : MvpPresenter<V>>(val presenter : P) {
 

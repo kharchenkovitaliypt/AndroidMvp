@@ -15,6 +15,8 @@ import com.idapgroup.android.mvp.impl.LcePresenterFragment
 
 class SampleLceActivity : SampleLceMvp.View, LcePresenterActivity<SampleLceMvp.View, SampleLceMvp.Presenter>() {
 
+    override var retainPresenter = true
+
     var loadDialog: ProgressDialog? = null
 
     override fun createPresenter() = SampleLcePresenter()

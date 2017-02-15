@@ -1,4 +1,4 @@
-package com.idapgroup.android.rx_mvp.load
+package com.idapgroup.android.mvp.impl
 
 import android.view.LayoutInflater
 import android.view.View

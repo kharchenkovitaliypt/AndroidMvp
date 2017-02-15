@@ -3,6 +3,7 @@ package com.idapgroup.android.mvp
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
+import com.idapgroup.android.mvp.impl.PresenterDelegate
 
 abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActivity() {
 
@@ -22,6 +23,9 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
     @Suppress("UNCHECKED_CAST")
     open val presenterView: V
         get() = this as V
+
+    /** Indicates to retain or not presenter when activity configuration changing */
+    open var retainPresenter = false
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,8 +49,8 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
     }
 
     @CallSuper
-    override fun onRetainCustomNonConfigurationInstance(): Any {
-        return presenterDelegate
+    override fun onRetainCustomNonConfigurationInstance(): Any? {
+        return if(retainPresenter) presenterDelegate else null
     }
 
     @CallSuper

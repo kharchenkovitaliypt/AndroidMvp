@@ -1,4 +1,4 @@
-package com.idapgroup.android.rx_mvp
+package com.idapgroup.android.mvp.impl
 
 import android.os.Bundle
 import android.os.Parcelable

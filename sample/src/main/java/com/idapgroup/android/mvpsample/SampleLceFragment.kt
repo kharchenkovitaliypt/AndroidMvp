@@ -12,6 +12,8 @@ import com.idapgroup.android.mvp.impl.LcePresenterFragment
 
 class SampleLceFragment : SampleLceMvp.View, LcePresenterFragment<SampleLceMvp.View, SampleLceMvp.Presenter>() {
 
+    override var retainPresenter = true
+
     override fun onCreatePresenter() = SampleLcePresenter()
 
     override fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View {

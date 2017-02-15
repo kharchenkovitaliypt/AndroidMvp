@@ -3,8 +3,8 @@
 //import android.support.test.InstrumentationRegistry.getInstrumentation
 //import android.support.test.rule.ActivityTestRule
 //import android.support.v7.app.AppCompatActivity
-//import com.idapgroup.android.mvp.BasePresenter
-//import com.idapgroup.android.mvp.BasePresenterFragment
+//import com.idapgroup.android.mvp.impl.BasePresenter
+//import com.idapgroup.android.mvp.impl.BasePresenterFragment
 //import com.idapgroup.android.mvp.tmpPresenterDelegatesStorage
 //import junit.framework.Assert.assertNotSame
 //import org.hamcrest.core.Is

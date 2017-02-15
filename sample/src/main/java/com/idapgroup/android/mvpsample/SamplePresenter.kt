@@ -1,11 +1,11 @@
 package com.idapgroup.android.mvpsample
 
-import com.idapgroup.android.rx_mvp.BaseRxPresenter
+import com.idapgroup.android.rx_mvp.RxBasePresenter
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-open class SamplePresenter : SampleMvp.Presenter, BaseRxPresenter<SampleMvp.View>() {
+open class SamplePresenter : SampleMvp.Presenter, RxBasePresenter<SampleMvp.View>() {
 
     init {
         setResetTaskStateAction("task_confirm", { view!!.hideLoad() })

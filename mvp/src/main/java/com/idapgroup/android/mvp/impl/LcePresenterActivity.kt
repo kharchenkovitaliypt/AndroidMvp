@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.idapgroup.android.mvp.*
-import com.idapgroup.android.rx_mvp.load.DefaultLceComponentViewCreator
+import com.idapgroup.android.mvp.impl.DefaultLceComponentViewCreator
 
-import com.idapgroup.android.rx_mvp.load.LceViewHandler
+import com.idapgroup.android.mvp.impl.LceViewHandler
 
 /** Fragment for displaying loading states(load, content, error)  */
 abstract class LcePresenterActivity<V, out P : MvpPresenter<V>> :
