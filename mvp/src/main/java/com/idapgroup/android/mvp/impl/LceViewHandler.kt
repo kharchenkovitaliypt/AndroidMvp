@@ -19,7 +19,7 @@ class DefaultLceViewCreator(
 
     object Layout {
         val ERROR = R.layout.lce_base_error
-        val LOAD = R.layout.lce_base_error
+        val LOAD = R.layout.lce_base_load
     }
 
     override fun onCreateErrorView(inflater: LayoutInflater, container: ViewGroup) : View {

@@ -16,7 +16,7 @@ class SampleLcePresenter : SampleLceMvp.Presenter, SamplePresenter() {
         execute { initContent() }
     }
 
-    fun initContent() {
+    fun initContent() { Observable.create<String> { it.setCancellable {  } }
         (view as SampleLceMvp.View).showLceLoad()
         Observable
                 .fromCallable {
