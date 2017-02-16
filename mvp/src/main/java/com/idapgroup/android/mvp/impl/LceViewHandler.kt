@@ -7,22 +7,27 @@ import android.widget.TextView
 import com.idapgroup.android.mvp.LceView
 import com.idapgroup.android.mvp.R
 
-interface LceComponentViewCreator {
+interface LceViewCreator {
     fun onCreateLoadView(inflater: LayoutInflater, container: ViewGroup) : View
     fun onCreateErrorView(inflater: LayoutInflater, container: ViewGroup) : View
     fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
 }
 
-class DefaultLceComponentViewCreator
-(val contentViewCreator: ((inflater: LayoutInflater, container: ViewGroup) -> View)? = null)
-    : LceComponentViewCreator {
+class DefaultLceViewCreator(
+        val contentViewCreator: ((LayoutInflater, ViewGroup) -> View)? = null
+): LceViewCreator {
+
+    object Layout {
+        val ERROR = R.layout.lce_base_error
+        val LOAD = R.layout.lce_base_error
+    }
 
     override fun onCreateErrorView(inflater: LayoutInflater, container: ViewGroup) : View {
-        return inflater.inflate(R.layout.lce_base_error, container, false)
+        return inflater.inflate(Layout.ERROR, container, false)
     }
 
     override fun onCreateLoadView(inflater: LayoutInflater, container: ViewGroup) : View {
-        return inflater.inflate(R.layout.lce_base_load, container, false)
+        return inflater.inflate(Layout.LOAD, container, false)
     }
 
     override fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View {
@@ -46,12 +51,12 @@ class LceViewHandler : LceView {
         private set
     var errorRetryView: View? = null
 
-    fun createAndInitView(inflater: LayoutInflater, rootContainer: ViewGroup?, creator: LceComponentViewCreator): View {
+    fun createAndInitView(inflater: LayoutInflater, rootContainer: ViewGroup?, creator: LceViewCreator): View {
         var container = inflater.inflate(BASE_CONTAINER_ID, rootContainer, false)
         return initView(inflater, container as ViewGroup, creator)
     }
 
-    fun initView(inflater: LayoutInflater, container: ViewGroup, creator: LceComponentViewCreator): View {
+    fun initView(inflater: LayoutInflater, container: ViewGroup, creator: LceViewCreator): View {
         val childCount = container.childCount
         return container.apply {
             // Load
@@ -114,11 +119,17 @@ class LceViewHandler : LceView {
     override fun showError(errorMessage: String, retry: (() -> Unit)?) {
         hideAll()
         errorContainerView!!.visibility = View.VISIBLE
-
         errorMessageView?.text = errorMessage
-        errorRetryView?.setOnClickListener(
-                if(retry == null) null else  View.OnClickListener { retry() }
-        )
+
+        if(errorRetryView != null) {
+            if(retry != null) {
+                errorRetryView!!.visibility = View.VISIBLE
+                errorRetryView!!.setOnClickListener { retry() }
+            } else {
+                errorRetryView!!.visibility = View.GONE
+                errorRetryView!!.setOnClickListener(null)
+            }
+        }
     }
 
     private fun hideAll() {

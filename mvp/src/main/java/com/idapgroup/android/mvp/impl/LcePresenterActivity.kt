@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.idapgroup.android.mvp.*
-import com.idapgroup.android.mvp.impl.DefaultLceComponentViewCreator
+import com.idapgroup.android.mvp.impl.DefaultLceViewCreator
 
 import com.idapgroup.android.mvp.impl.LceViewHandler
 
@@ -15,12 +15,11 @@ abstract class LcePresenterActivity<V, out P : MvpPresenter<V>> :
         BasePresenterActivity<V, P>(),
         LceView {
 
-    private var lceViewHandler = LceViewHandler()
-    private val defaultLceComponentViewCreator = DefaultLceComponentViewCreator(
-        { inflater, container ->
-            onCreateContentView(inflater, container)
-        }
-    )
+    protected val lceViewHandler = LceViewHandler()
+
+    open val lceViewCreator: LceViewCreator = DefaultLceViewCreator {
+        inflater, container -> onCreateContentView(inflater, container)
+    }
 
     abstract fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
 
@@ -30,7 +29,7 @@ abstract class LcePresenterActivity<V, out P : MvpPresenter<V>> :
 
         super.setContentView(LceViewHandler.BASE_CONTAINER_ID)
         val lceContainer = findViewById(R.id.lce_container) as ViewGroup
-        lceViewHandler.initView(layoutInflater, lceContainer, defaultLceComponentViewCreator)
+        lceViewHandler.initView(layoutInflater, lceContainer, lceViewCreator)
     }
 
     override fun setContentView(layoutResID: Int) {

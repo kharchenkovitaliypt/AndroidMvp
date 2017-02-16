@@ -10,7 +10,7 @@ import com.idapgroup.android.mvp.impl.BasePresenterFragment
 import com.idapgroup.android.mvp.LceView
 import com.idapgroup.android.mvp.MvpPresenter
 import com.idapgroup.android.mvp.R
-import com.idapgroup.android.mvp.impl.DefaultLceComponentViewCreator
+import com.idapgroup.android.mvp.impl.DefaultLceViewCreator
 import com.idapgroup.android.mvp.impl.LceViewHandler
 
 /** Fragment for displaying loading states(load, content, error)  */
@@ -18,17 +18,16 @@ abstract class LcePresenterFragment<V, out P : MvpPresenter<V>> :
         BasePresenterFragment<V, P>(),
         LceView{
 
-    private var lceViewHandler = LceViewHandler()
-    private val defaultLceComponentViewCreator = DefaultLceComponentViewCreator(
-            { inflater, container ->
-                onCreateContentView(inflater, container)
-            }
-    )
+    protected val lceViewHandler = LceViewHandler()
+
+    open val lceViewCreator: LceViewCreator = DefaultLceViewCreator { inflater, container ->
+        onCreateContentView(inflater, container)
+    }
 
     abstract fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
 
     override fun onCreateView(inflater: LayoutInflater, rootContainer: ViewGroup?, savedInstanceState: Bundle?): View {
-        return lceViewHandler.createAndInitView(inflater, rootContainer, defaultLceComponentViewCreator)
+        return lceViewHandler.createAndInitView(inflater, rootContainer, lceViewCreator)
     }
 
     @CallSuper
