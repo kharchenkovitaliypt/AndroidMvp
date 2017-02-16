@@ -3,9 +3,7 @@ package com.idapgroup.android.mvp.impl
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
-import android.util.SparseArray
 import com.idapgroup.android.mvp.MvpPresenter
-import com.idapgroup.android.mvp.impl.PresenterDelegate
 import java.util.*
 
 /** Temporary preserves [PresenterDelegate]s when activity configuration changing(recreating) */

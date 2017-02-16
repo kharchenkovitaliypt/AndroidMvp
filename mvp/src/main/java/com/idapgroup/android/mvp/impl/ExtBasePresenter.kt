@@ -3,8 +3,6 @@ package com.idapgroup.android.mvp.impl
 import android.os.Handler
 import android.os.Looper
 import android.support.annotation.CallSuper
-import android.util.Log
-import com.idapgroup.android.mvp.impl.BasePresenter
 import java.util.*
 
 open class ExtBasePresenter<V> : BasePresenter<V>() {

@@ -5,10 +5,10 @@ import android.support.annotation.CallSuper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.idapgroup.android.mvp.*
-import com.idapgroup.android.mvp.impl.DefaultLceViewCreator
-
-import com.idapgroup.android.mvp.impl.LceViewHandler
+import com.idapgroup.android.mvp.BasePresenterActivity
+import com.idapgroup.android.mvp.LceView
+import com.idapgroup.android.mvp.MvpPresenter
+import com.idapgroup.android.mvp.R
 
 /** Fragment for displaying loading states(load, content, error)  */
 abstract class LcePresenterActivity<V, out P : MvpPresenter<V>> :

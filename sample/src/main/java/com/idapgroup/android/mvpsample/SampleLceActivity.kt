@@ -1,17 +1,12 @@
 package com.idapgroup.android.mvpsample
 
 import android.app.ProgressDialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import com.idapgroup.android.mvp.impl.LcePresenterActivity
-import com.idapgroup.android.mvp.impl.LcePresenterFragment
 
 class SampleLceActivity : SampleLceMvp.View, LcePresenterActivity<SampleLceMvp.View, SampleLceMvp.Presenter>() {
 

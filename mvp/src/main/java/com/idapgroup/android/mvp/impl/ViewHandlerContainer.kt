@@ -6,7 +6,6 @@ import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutCompat
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import com.idapgroup.android.mvp.impl.ViewHandler
 
 open class ViewHandlerContainer : LinearLayoutCompat {
 

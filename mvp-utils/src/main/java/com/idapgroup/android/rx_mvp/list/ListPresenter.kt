@@ -1,9 +1,8 @@
 package com.idapgroup.android.rx_mvp.list
 
 import android.os.Bundle
-import com.idapgroup.android.rx_mvp.list.ListMvp
-import com.idapgroup.android.rx_mvp.list.ListMvp.View.LoadMoreState.*
-import com.idapgroup.android.mvp.impl.BasePresenter
+import com.idapgroup.android.rx_mvp.list.ListMvp.View.LoadMoreState.HIDE
+import com.idapgroup.android.rx_mvp.list.ListMvp.View.LoadMoreState.MORE
 
 abstract class ListPresenter<in T> : ListMvp.Presenter {
 

@@ -1,11 +1,8 @@
 package com.idapgroup.android.rx_mvp
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.support.annotation.CallSuper
 import android.util.Log
-import com.idapgroup.android.mvp.impl.BasePresenter
 import com.idapgroup.android.mvp.impl.ExtBasePresenter
 import io.reactivex.ObservableTransformer
 import io.reactivex.SingleTransformer
