@@ -18,14 +18,12 @@ open class SamplePresenter : SampleMvp.Presenter, RxBasePresenter<SampleMvp.View
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(taskTracker("task_confirm"))
-                .subscribe(
+                .safeSubscribe(
                         {
-                            execute {
-                                view!!.hideLoad()
-                                view!!.goToMain()
-                            }
+                            view!!.hideLoad()
+                            view!!.goToMain()
                         },
-                        { execute { view!!.showError(it) } }
+                        { view!!.showError(it) }
                 )
     }
 
