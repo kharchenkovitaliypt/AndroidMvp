@@ -9,14 +9,6 @@
 //import android.view.LayoutInflater
 //import android.view.View
 //import android.view.ViewGroup
-//import com.idap.worldbank.App
-//import com.idap.worldbank.R
-//import com.idap.worldbank.data_model.data.Country
-//import com.idap.worldbank.screen.country.details.CountryDetailsFragment
-//import com.idapgroup.android.rx_mvp.list.ListMvp.View.LoadMoreState
-//import com.idapgroup.android.rx_mvp.list.ListMvp.View.LoadMoreState.*
-//import com.idapgroup.android.mvp.impl.LcePresenterFragment
-//import com.idapgroup.android.rx_mvp.list.ListMvp
 //import kotlinx.android.synthetic.main.fragment_country_list.*
 //import kotlinx.android.synthetic.main.fragment_country_list.view.*
 //import kotlinx.android.synthetic.main.item_action.view.*

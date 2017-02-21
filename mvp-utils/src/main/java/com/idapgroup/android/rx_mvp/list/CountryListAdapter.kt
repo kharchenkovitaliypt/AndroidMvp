@@ -4,8 +4,6 @@
 //import android.view.View
 //import com.airbnb.epoxy.EpoxyAdapter
 //import com.airbnb.epoxy.EpoxyModel
-//import com.idap.worldbank.R
-//import com.idap.worldbank.data_model.data.Country
 //import kotlinx.android.synthetic.main.item_country.view.*
 //import java.util.*
 //

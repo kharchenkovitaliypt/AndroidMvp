@@ -9,14 +9,9 @@ import com.idapgroup.android.mvp.impl.ExtBasePresenter
 import io.reactivex.*
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
 import io.reactivex.internal.functions.Functions
-import io.reactivex.subjects.AsyncSubject
 import io.reactivex.subjects.CompletableSubject
-import io.reactivex.subjects.Subject
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 open class RxBasePresenter<V> : ExtBasePresenter<V>() {
 
@@ -45,7 +40,6 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
         private fun addSubTask(subTask: Disposable) {
             checkMainThread()
             subTaskList.add(subTask)
-            Log.d("TAG", "addSubTask() key: '$key',  subTaskCount: $subTaskCount")
             ++subTaskCount
 
             if(cancelled) subTask.dispose()
@@ -54,13 +48,11 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
         fun removeSubTask() {
             checkMainThread("taskTracker(key) must be call after" +
                     " observeOn(AndroidSchedulers.mainThread())")
-            Log.d("TAG", "removeSubTask() key: '$key', subTaskCount: $subTaskCount")
             --subTaskCount
 
             if(subTaskCount == 0) {
                 activeTasks.remove(key)
                 completable.onComplete()
-                Log.d("TAG", "onTaskComplete() key: '$key'")
             }
         }
 
