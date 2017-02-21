@@ -1,6 +1,8 @@
 package com.idapgroup.android.rx_mvp
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.support.annotation.CallSuper
 import android.util.Log
 import com.idapgroup.android.mvp.impl.ExtBasePresenter
@@ -10,6 +12,9 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import io.reactivex.internal.functions.Functions
+import io.reactivex.subjects.AsyncSubject
+import io.reactivex.subjects.CompletableSubject
+import io.reactivex.subjects.Subject
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -18,76 +23,135 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
     // Optimization for safe subscribe
     private val ERROR_CONSUMER: (Throwable) -> Unit = { Functions.ERROR_CONSUMER.accept(it) }
     private val EMPTY_ACTION: () -> Unit = {}
+    private val COMPLETED = CompletableSubject.create().apply {
+        onComplete()
+    }
 
-    private val activeTasks = LinkedHashMap<String, Disposable>()
-    private val resetTaskStateActionMap = ConcurrentHashMap<String, () -> Unit>()
+    private val handler = Handler(Looper.getMainLooper())
+    private val activeTasks = LinkedHashMap<String, Task>()
+    private val resetTaskStateActionMap = LinkedHashMap<String, () -> Unit>()
+    private var isSavedState = false
+
+    inner class Task(val key: String) {
+        private val subTaskList = ArrayList<Disposable>()
+        private var subTaskCount = 0
+        private var cancelled = false
+        private var completable = CompletableSubject.create()
+
+        fun safeAddSubTask(subTask: Disposable) {
+            handler.post { addSubTask(subTask) }
+        }
+
+        private fun addSubTask(subTask: Disposable) {
+            checkMainThread()
+            subTaskList.add(subTask)
+            Log.d("TAG", "addSubTask() key: '$key',  subTaskCount: $subTaskCount")
+            ++subTaskCount
+
+            if(cancelled) subTask.dispose()
+        }
+
+        fun removeSubTask() {
+            checkMainThread("taskTracker(key) must be call after" +
+                    " observeOn(AndroidSchedulers.mainThread())")
+            Log.d("TAG", "removeSubTask() key: '$key', subTaskCount: $subTaskCount")
+            --subTaskCount
+
+            if(subTaskCount == 0) {
+                activeTasks.remove(key)
+                completable.onComplete()
+                Log.d("TAG", "onTaskComplete() key: '$key'")
+            }
+        }
+
+        fun cancel(): Completable {
+            checkMainThread()
+            val activeSubTaskList = subTaskList.filter { !it.isDisposed }
+            activeSubTaskList.forEach { it.dispose() }
+            cancelled = true
+            return if(activeSubTaskList.isEmpty()) COMPLETED else completable
+        }
+    }
 
     @CallSuper
     override fun onSaveState(savedState: Bundle) {
         super.onSaveState(savedState)
         savedState.putStringArrayList("task_keys", ArrayList(activeTasks.keys))
+        isSavedState = true
     }
 
     @CallSuper
     override fun onRestoreState(savedState: Bundle) {
         super.onRestoreState(savedState)
-        val taskKeys = savedState.getStringArrayList("task_keys")
-        taskKeys.forEach { key ->
-            val activeTask = activeTasks.containsKey(key)
-            if (!activeTask) resetTaskState(key)
+        // Reset tasks only if presenter was destroyed
+        if(!isSavedState) {
+            val taskKeyList = savedState.getStringArrayList("task_keys")
+            taskKeyList.forEach { resetTaskState(it) }
         }
     }
 
     /** Preserves link for task by key while it's running  */
-    protected fun <T> taskTracker(key: String): ObservableTransformer<T, T> {
-        return ObservableTransformer {
-                    it.doOnSubscribe { addDisposable(key, it) }
-                    .doOnDispose { activeTasks.remove(key) }
-        }
+    protected fun <T> taskTracker(taskKey: String): ObservableTransformer<T, T> {
+        return ObservableTransformer { it.taskTracker(taskKey) }
     }
 
     /** Preserves link for task by key while it's running  */
-    protected fun <T> singleTaskTracker(key: String): SingleTransformer<T, T> {
-        return SingleTransformer {
-                    it.doOnSubscribe { addDisposable(key, it) }
-                    .doOnSuccess { activeTasks.remove(key) }
-                    .doOnError { activeTasks.remove(key) }
-                    .doOnDispose { activeTasks.remove(key) }
-        }
+    protected fun <T> Observable<T>.taskTracker(taskKey: String): Observable<T> {
+        val task = addTask(taskKey)
+        return doFinally { task.removeSubTask() }
+                .doOnSubscribe { disposable -> task.safeAddSubTask(disposable) }
     }
 
     /** Preserves link for task by key while it's running  */
-    protected fun completableTaskTracker(key: String): CompletableTransformer {
-        return CompletableTransformer {
-                    it.doOnSubscribe { addDisposable(key, it) }
-                    .doOnTerminate { activeTasks.remove(key) }
-                    .doOnDispose { activeTasks.remove(key) }
-        }
+    protected fun <T> singleTaskTracker(taskKey: String): SingleTransformer<T, T> {
+        return SingleTransformer { it.taskTracker(taskKey) }
     }
 
-    private fun addDisposable(key: String, disposable: Disposable) {
-        if (activeTasks.containsKey(key)) {
-            throw IllegalArgumentException("Task already started")
+    /** Preserves link for task by key while it's running  */
+    protected fun <T> Single<T>.taskTracker(taskKey: String): Single<T> {
+        val task = addTask(taskKey)
+        return doFinally { task.removeSubTask() }
+                .doOnSubscribe { disposable -> task.safeAddSubTask(disposable) }
+    }
+
+    /** Preserves link for task by key while it's running  */
+    protected fun completableTaskTracker(taskKey: String): CompletableTransformer {
+        return CompletableTransformer { it.taskTracker(taskKey) }
+    }
+
+    /** Preserves link for task by key while it's running  */
+    protected fun Completable.taskTracker(taskKey: String): Completable {
+        val task = addTask(taskKey)
+        return doFinally { task.removeSubTask() }
+                .doOnSubscribe { disposable -> task.safeAddSubTask(disposable) }
+    }
+
+    private fun addTask(taskKey: String): Task {
+        checkMainThread()
+        if(activeTasks.containsKey(taskKey)) {
+            throw IllegalStateException("'$taskKey' is already tracked")
         }
-        activeTasks.put(key, disposable)
+        val task = Task(taskKey)
+        activeTasks[taskKey] = task
+        return task
     }
 
     protected fun setResetTaskStateAction(key: String, resetAction: () -> Unit) {
         resetTaskStateActionMap.put(key, resetAction)
     }
 
-    protected fun cancelTask(taskKey: String) {
-        val task = activeTasks[taskKey]
-        if (task != null) {
-            task.dispose()
-            activeTasks.remove(taskKey)
-            resetTaskState(taskKey)
-        }
+    protected fun cancelTask(taskKey: String): Completable {
+        checkMainThread()
+        val task = activeTasks[taskKey] ?: return COMPLETED
+        activeTasks.remove(taskKey)
+        val completable = task.cancel()
+        resetTaskState(taskKey)
+        return completable
     }
 
     protected fun isTaskActive(taskKey: String): Boolean {
-        val task = activeTasks[taskKey]
-        return task != null && !task.isDisposed
+        checkMainThread()
+        return activeTasks[taskKey] != null
     }
 
     /** Calls preliminarily set a reset task state action   */
@@ -105,34 +169,46 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
             onError: (Throwable) -> Unit = ERROR_CONSUMER,
             onComplete: () -> Unit = EMPTY_ACTION
     ): Disposable {
-        val safeOnError = { error: Throwable -> execute { onError(error) } }
-        val safeOnComplete = { execute(onComplete) }
-        return subscribe(
-                { nextItem -> execute { onNext(nextItem) } },
-                if(onError == ERROR_CONSUMER) ERROR_CONSUMER else safeOnError,
-                if(onComplete == EMPTY_ACTION) EMPTY_ACTION else safeOnComplete
-        )
+        return subscribe(safeOnNext(onNext), safeOnError(onError), safeOnComplete(onComplete))
     }
 
     fun <T> Single<T>.safeSubscribe(
             onSuccess: (T) -> Unit,
             onError: (Throwable) -> Unit = ERROR_CONSUMER
     ): Disposable {
-        val safeOnError = { error: Throwable -> execute { onError(error) } }
-        return subscribe(
-                { result -> execute { onSuccess(result) } },
-                if(onError == ERROR_CONSUMER) ERROR_CONSUMER else safeOnError
-        )
+        return subscribe(safeOnNext(onSuccess), safeOnError(onError))
     }
 
     fun Completable.safeSubscribe(
             onComplete: () -> Unit,
             onError: (Throwable) -> Unit = ERROR_CONSUMER
     ): Disposable {
-        val safeOnError = { error: Throwable -> execute { onError(error) } }
-        return subscribe(
-                { execute(onComplete) },
-                if(onError == ERROR_CONSUMER) ERROR_CONSUMER else safeOnError
-        )
+        return subscribe({ execute(onComplete) }, safeOnError(onError))
+    }
+
+    fun <T> safeOnNext(onNext: (T) -> Unit): (T) -> Unit {
+        return { nextItem -> execute { onNext(nextItem) } }
+    }
+
+    fun safeOnComplete(onComplete: () -> Unit): () -> Unit {
+        if(onComplete == EMPTY_ACTION) {
+            return EMPTY_ACTION
+        } else {
+            return { execute(onComplete) }
+        }
+    }
+
+    fun safeOnError(onError: (Throwable) -> Unit): (Throwable) -> Unit {
+        if(onError == ERROR_CONSUMER) {
+            return ERROR_CONSUMER
+        } else {
+            return { error: Throwable -> execute { onError(error) } }
+        }
+    }
+
+    fun checkMainThread(message: String = "Must be called from main thread") {
+        if(Looper.myLooper() != Looper.getMainLooper()) {
+            throw IllegalStateException(message)
+        }
     }
 }

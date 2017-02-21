@@ -29,7 +29,7 @@ class SampleLcePresenter : SampleLceMvp.Presenter, SamplePresenter() {
                 }
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(taskTracker("task_start"))
+                .taskTracker("task_start")
                 .safeSubscribe(
                         { (view as SampleLceMvp.View).showContent() },
                         { view!!.showError(it) }

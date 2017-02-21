@@ -17,7 +17,7 @@ open class SamplePresenter : SampleMvp.Presenter, RxBasePresenter<SampleMvp.View
                 .fromCallable { Thread.sleep(3000) }
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(taskTracker("task_confirm"))
+                .taskTracker("task_confirm")
                 .safeSubscribe(
                         {
                             view!!.hideLoad()
