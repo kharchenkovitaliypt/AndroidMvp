@@ -13,7 +13,7 @@ interface LceViewCreator {
     fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
 }
 
-class DefaultLceViewCreator(
+open class DefaultLceViewCreator(
         val contentViewCreator: ((LayoutInflater, ViewGroup) -> View)? = null
 ): LceViewCreator {
 
@@ -52,7 +52,7 @@ class LceViewHandler : LceView {
     var errorRetryView: View? = null
 
     fun createAndInitView(inflater: LayoutInflater, rootContainer: ViewGroup?, creator: LceViewCreator): View {
-        var container = inflater.inflate(BASE_CONTAINER_ID, rootContainer, false)
+        val container = inflater.inflate(BASE_CONTAINER_ID, rootContainer, false)
         return initView(inflater, container as ViewGroup, creator)
     }
 
