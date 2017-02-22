@@ -30,7 +30,7 @@ class PresenterDelegate<in V, out P : MvpPresenter<V>>(val presenter : P) {
     }
 
     fun detachView() {
-        presenter.detachView()
         presenter.onDetachedView()
+        presenter.detachView()
     }
 }
