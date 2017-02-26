@@ -14,7 +14,7 @@ class SampleLceActivity : SampleLceMvp.View, LcePresenterActivity<SampleLceMvp.V
 
     var loadDialog: ProgressDialog? = null
 
-    override fun createPresenter() = SampleLcePresenter()
+    override fun onCreatePresenter() = SampleLcePresenter()
 
     override fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View {
         return inflater.inflate(R.layout.screen_sample, container, false)
