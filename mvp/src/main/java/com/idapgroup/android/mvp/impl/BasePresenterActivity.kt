@@ -28,7 +28,7 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
     open var retainPresenter = false
 
     /** Usefully for flexible view attach and detach handle */
-    open var manualViewAttach = false
+    open val manualViewAttach = false
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {

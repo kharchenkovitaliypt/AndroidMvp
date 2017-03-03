@@ -30,7 +30,7 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
         get() = this as V
 
     /** Indicates to retain or not presenter when activity configuration changing */
-    open var retainPresenter = false
+    open val retainPresenter = false
 
     /** Usefully for flexible view attach and detach handle */
     open var manualViewAttach = false
