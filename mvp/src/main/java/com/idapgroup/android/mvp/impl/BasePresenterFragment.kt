@@ -32,6 +32,9 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
     /** Indicates to retain or not presenter when activity configuration changing */
     open var retainPresenter = false
 
+    /** Usefully for flexible view attach and detach handle */
+    open var manualViewAttach = false
+
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,13 +66,31 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
     @CallSuper
     override fun onResume() {
         super.onResume()
-        presenterDelegate.attachView(presenterView)
+        if(!manualViewAttach) {
+            presenterDelegate.attachView(presenterView)
+        }
     }
 
     @CallSuper
     override fun onPause() {
-        presenterDelegate.detachView()
+        if(!manualViewAttach) {
+            presenterDelegate.detachView()
+        }
         super.onPause()
+    }
+
+    protected fun attachView() {
+        if(!manualViewAttach) {
+            throw IllegalStateException("Use only with manualViewAttach set to true")
+        }
+        presenterDelegate.attachView(presenterView)
+    }
+
+    protected fun detachView() {
+        if(!manualViewAttach) {
+            throw IllegalStateException("Use only with manualViewAttach set to true")
+        }
+        presenterDelegate.detachView()
     }
 
     /**
