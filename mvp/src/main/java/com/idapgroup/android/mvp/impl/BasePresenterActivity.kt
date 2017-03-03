@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
 import com.idapgroup.android.mvp.MvpPresenter
-import com.idapgroup.android.mvp.impl.PresenterDelegate
 
 abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActivity() {
 
@@ -27,6 +26,9 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
 
     /** Indicates to retain or not presenter when activity configuration changing */
     open var retainPresenter = false
+
+    /** Usefully for flexible view attach and detach handle */
+    open var manualViewAttach = false
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,12 +59,30 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
     @CallSuper
     override fun onResume() {
         super.onResume()
-        presenterDelegate.attachView(presenterView)
+        if(!manualViewAttach) {
+            presenterDelegate.attachView(presenterView)
+        }
     }
 
     @CallSuper
     override fun onPause() {
-        presenterDelegate.detachView()
+        if(!manualViewAttach) {
+            presenterDelegate.detachView()
+        }
         super.onPause()
+    }
+
+    protected fun attachView() {
+        if(!manualViewAttach) {
+            throw IllegalStateException("Use only with manualViewAttach set to true")
+        }
+        presenterDelegate.attachView(presenterView)
+    }
+
+    protected fun detachView() {
+        if(!manualViewAttach) {
+            throw IllegalStateException("Use only with manualViewAttach set to true")
+        }
+        presenterDelegate.detachView()
     }
 }
