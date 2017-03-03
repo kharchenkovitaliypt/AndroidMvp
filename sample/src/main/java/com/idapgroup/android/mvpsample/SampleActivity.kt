@@ -4,13 +4,13 @@ import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.widget.TextView
-import com.idapgroup.android.mvp.BasePresenterActivity
+import com.idapgroup.android.mvp.impl.BasePresenterActivity
 
 class SampleActivity : BasePresenterActivity<SampleMvp.View, SampleMvp.Presenter>(), SampleMvp.View {
 
     var loadDialog: ProgressDialog? = null
 
-    override fun createPresenter() = SamplePresenter()
+    override fun onCreatePresenter() = SamplePresenter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

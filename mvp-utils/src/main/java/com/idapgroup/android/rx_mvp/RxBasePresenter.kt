@@ -59,8 +59,18 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
         fun cancel(): Completable {
             checkMainThread()
             val activeSubTaskList = subTaskList.filter { !it.isDisposed }
+            val awaitState = await(activeSubTaskList)
             activeSubTaskList.forEach { it.dispose() }
             cancelled = true
+            return awaitState
+        }
+
+        fun await(): Completable {
+            val activeSubTaskList = subTaskList.filter { !it.isDisposed }
+            return await(activeSubTaskList)
+        }
+
+        fun await(activeSubTaskList: List<Disposable>): Completable {
             return if(activeSubTaskList.isEmpty()) COMPLETED else completable
         }
     }
@@ -139,6 +149,10 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
         val completable = task.cancel()
         resetTaskState(taskKey)
         return completable
+    }
+
+    protected fun awaitTask(taskKey: String): Completable {
+        return activeTasks[taskKey]?.await() ?: return COMPLETED
     }
 
     protected fun isTaskActive(taskKey: String): Boolean {

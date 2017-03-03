@@ -1,8 +1,9 @@
-package com.idapgroup.android.mvp
+package com.idapgroup.android.mvp.impl
 
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
+import com.idapgroup.android.mvp.MvpPresenter
 import com.idapgroup.android.mvp.impl.PresenterDelegate
 
 abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActivity() {
@@ -17,7 +18,7 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
      * This instance should not contain explicit or implicit reference for [android.app.Activity] context
      * since it will be keep on rotations.
      */
-    abstract fun createPresenter(): P
+    abstract fun onCreatePresenter(): P
 
     /** Override in case of activity not implementing Presenter<View> interface <View> */
     @Suppress("UNCHECKED_CAST")
@@ -34,7 +35,7 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
         @Suppress("UNCHECKED_CAST")
         val pd = lastCustomNonConfigurationInstance as? PresenterDelegate<V, P>
         // Create new if null
-        presenterDelegate = pd ?: PresenterDelegate(createPresenter())
+        presenterDelegate = pd ?: PresenterDelegate(onCreatePresenter())
 
         if(savedInstanceState != null) {
             presenterDelegate.onRestoreState(savedInstanceState)

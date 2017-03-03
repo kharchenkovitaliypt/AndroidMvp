@@ -5,7 +5,6 @@ import android.support.annotation.CallSuper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.idapgroup.android.mvp.BasePresenterActivity
 import com.idapgroup.android.mvp.LceView
 import com.idapgroup.android.mvp.MvpPresenter
 import com.idapgroup.android.mvp.R
