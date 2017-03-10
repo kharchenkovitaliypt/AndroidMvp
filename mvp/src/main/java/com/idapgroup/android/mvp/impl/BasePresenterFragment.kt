@@ -48,6 +48,9 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
             presenterDelegate = retainedPresenterDelegates[fragmentId] as PresenterDelegate<V, P>
             retainedPresenterDelegates.remove(fragmentId)
         }
+        if(savedInstanceState != null) {
+            presenterDelegate.onRestoreState(savedInstanceState)
+        }
         presenterDelegate.onCreate()
     }
 
