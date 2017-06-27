@@ -33,7 +33,6 @@ abstract class BasePresenterDialogFragment<V, out P : MvpPresenter<V>> : DialogF
     /** Usefully for flexible view attach and detach handle */
     open var manualViewAttach = false
 
-    @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -52,7 +51,6 @@ abstract class BasePresenterDialogFragment<V, out P : MvpPresenter<V>> : DialogF
         presenterDelegate.onCreate()
     }
 
-    @CallSuper
     override fun onSaveInstanceState(savedState: Bundle) {
         super.onSaveInstanceState(savedState)
         presenterDelegate.onSaveState(savedState)
@@ -64,7 +62,6 @@ abstract class BasePresenterDialogFragment<V, out P : MvpPresenter<V>> : DialogF
         }
     }
 
-    @CallSuper
     override fun onResume() {
         super.onResume()
         if(!manualViewAttach) {
@@ -72,7 +69,6 @@ abstract class BasePresenterDialogFragment<V, out P : MvpPresenter<V>> : DialogF
         }
     }
 
-    @CallSuper
     override fun onPause() {
         if(!manualViewAttach) {
             presenterDelegate.detachView()

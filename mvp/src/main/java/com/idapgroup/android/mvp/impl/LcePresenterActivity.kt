@@ -22,7 +22,6 @@ abstract class LcePresenterActivity<V, out P : MvpPresenter<V>> :
 
     abstract fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
 
-    @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

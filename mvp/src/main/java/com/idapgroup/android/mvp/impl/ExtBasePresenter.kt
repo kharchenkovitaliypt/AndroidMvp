@@ -10,7 +10,6 @@ open class ExtBasePresenter<V> : BasePresenter<V>() {
     private val handler = Handler(Looper.getMainLooper())
     private val pendingActions = ArrayList<() -> Unit>()
 
-    @CallSuper
     override fun onAttachedView(view: V) {
         super.onAttachedView(view)
         pendingActions.forEach { it() }

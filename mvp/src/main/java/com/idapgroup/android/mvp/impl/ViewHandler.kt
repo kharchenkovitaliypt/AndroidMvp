@@ -56,7 +56,6 @@ abstract class ViewHandler(@IdRes val id: Int = NO_ID) {
         return savedState
     }
 
-    @CallSuper
     fun onRestoreInstanceState(savedState: Bundle) {
         visible = savedState.getBoolean(STATE_KEY_VISIBLE, true)
         val savedHierarchyState = savedState.getSparseParcelableArray<Parcelable>(STATE_KEY_HIERARCHY)

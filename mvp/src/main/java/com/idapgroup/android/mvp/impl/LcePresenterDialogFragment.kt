@@ -25,7 +25,6 @@ abstract class LcePresenterDialogFragment<V, out P : MvpPresenter<V>> :
         return lceViewHandler.createAndInitView(inflater, rootContainer, lceViewCreator)
     }
 
-    @CallSuper
     override fun onDestroyView() {
         super.onDestroyView()
         lceViewHandler.resetView()

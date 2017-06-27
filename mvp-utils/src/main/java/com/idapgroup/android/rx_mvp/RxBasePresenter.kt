@@ -128,6 +128,18 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
                 .doOnSubscribe { disposable -> task.safeAddSubTask(disposable) }
     }
 
+    /** Preserves link for task by key while it's running  */
+    protected fun <T> maybeTaskTracker(taskKey: String): MaybeTransformer<T, T> {
+        return MaybeTransformer { it.taskTracker(taskKey) }
+    }
+
+    /** Preserves link for task by key while it's running  */
+    protected fun <T> Maybe<T>.taskTracker(taskKey: String): Maybe<T> {
+        val task = addTask(taskKey)
+        return doFinally { task.removeSubTask() }
+                .doOnSubscribe { disposable -> task.safeAddSubTask(disposable) }
+    }
+
     private fun addTask(taskKey: String): Task {
         checkMainThread()
         if(activeTasks.containsKey(taskKey)) {
@@ -190,6 +202,14 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
             onError: (Throwable) -> Unit = ERROR_CONSUMER
     ): Disposable {
         return subscribe({ execute(onComplete) }, safeOnError(onError))
+    }
+
+    fun <T> Maybe<T>.safeSubscribe(
+            onSuccess: () -> Unit,
+            onError: (Throwable) -> Unit = ERROR_CONSUMER,
+            onComplete: () -> Unit = EMPTY_ACTION
+    ): Disposable {
+        return subscribe({ execute(onSuccess) }, safeOnError(onError), safeOnComplete(onComplete))
     }
 
     fun <T> safeOnNext(onNext: (T) -> Unit): (T) -> Unit {

@@ -1,7 +1,6 @@
 package com.idapgroup.android.mvp.impl
 
 import android.os.Bundle
-import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
 import com.idapgroup.android.mvp.MvpPresenter
 
@@ -30,7 +29,6 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
     /** Usefully for flexible view attach and detach handle */
     open val manualViewAttach = false
 
-    @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,18 +43,15 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
         presenterDelegate.onCreate()
     }
 
-    @CallSuper
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         presenterDelegate.onSaveState(outState)
     }
 
-    @CallSuper
     override fun onRetainCustomNonConfigurationInstance(): Any? {
         return if(retainPresenter) presenterDelegate else null
     }
 
-    @CallSuper
     override fun onResume() {
         super.onResume()
         if(!manualViewAttach) {
@@ -64,7 +59,6 @@ abstract class BasePresenterActivity<V, out P : MvpPresenter<V>> : AppCompatActi
         }
     }
 
-    @CallSuper
     override fun onPause() {
         if(!manualViewAttach) {
             presenterDelegate.detachView()
