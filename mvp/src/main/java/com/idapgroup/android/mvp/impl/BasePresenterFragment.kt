@@ -38,18 +38,16 @@ abstract class BasePresenterFragment<V, out P : MvpPresenter<V>> : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if(savedInstanceState == null || retainedPresenterDelegates.size == 0) {
-            presenterDelegate = PresenterDelegate(onCreatePresenter())
-        } else {
+        val fragmentId = savedInstanceState?.getString(KEY_FRAGMENT_ID)
+        if(fragmentId != null && retainedPresenterDelegates.isNotEmpty()) {
             // Restore previously preserved presenter when configuration change
-            val fragmentId = savedInstanceState.getString(KEY_FRAGMENT_ID)
             @Suppress("UNCHECKED_CAST")
             presenterDelegate = retainedPresenterDelegates[fragmentId] as PresenterDelegate<V, P>
             retainedPresenterDelegates.remove(fragmentId)
+        } else {
+            presenterDelegate = PresenterDelegate(onCreatePresenter())
         }
-        if(savedInstanceState != null) {
-            presenterDelegate.onRestoreState(savedInstanceState)
-        }
+        savedInstanceState?.let { presenterDelegate.onRestoreState(it) }
         presenterDelegate.onCreate()
     }
 
