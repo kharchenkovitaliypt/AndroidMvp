@@ -3,7 +3,6 @@ package com.idapgroup.android.rx_mvp
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.support.annotation.CallSuper
 import android.util.Log
 import com.idapgroup.android.mvp.impl.ExtBasePresenter
 import io.reactivex.*
@@ -75,14 +74,12 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
         }
     }
 
-    @CallSuper
     override fun onSaveState(savedState: Bundle) {
         super.onSaveState(savedState)
         savedState.putStringArrayList("task_keys", ArrayList(activeTasks.keys))
         isSavedState = true
     }
 
-    @CallSuper
     override fun onRestoreState(savedState: Bundle) {
         super.onRestoreState(savedState)
         // Reset tasks only if presenter was destroyed
@@ -187,14 +184,14 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
             onError: (Throwable) -> Unit = ERROR_CONSUMER,
             onComplete: () -> Unit = EMPTY_ACTION
     ): Disposable {
-        return subscribe(safeOnNext(onNext), safeOnError(onError), safeOnComplete(onComplete))
+        return subscribe(safeOnItem(onNext), safeOnError(onError), safeOnComplete(onComplete))
     }
 
     fun <T> Single<T>.safeSubscribe(
             onSuccess: (T) -> Unit,
             onError: (Throwable) -> Unit = ERROR_CONSUMER
     ): Disposable {
-        return subscribe(safeOnNext(onSuccess), safeOnError(onError))
+        return subscribe(safeOnItem(onSuccess), safeOnError(onError))
     }
 
     fun Completable.safeSubscribe(
@@ -205,15 +202,15 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
     }
 
     fun <T> Maybe<T>.safeSubscribe(
-            onSuccess: () -> Unit,
+            onSuccess: (T) -> Unit,
             onError: (Throwable) -> Unit = ERROR_CONSUMER,
             onComplete: () -> Unit = EMPTY_ACTION
     ): Disposable {
-        return subscribe({ execute(onSuccess) }, safeOnError(onError), safeOnComplete(onComplete))
+        return subscribe(safeOnItem(onSuccess), safeOnError(onError), safeOnComplete(onComplete))
     }
 
-    fun <T> safeOnNext(onNext: (T) -> Unit): (T) -> Unit {
-        return { nextItem -> execute { onNext(nextItem) } }
+    fun <T> safeOnItem(onItem: (T) -> Unit): (T) -> Unit {
+        return { item -> execute { onItem(item) } }
     }
 
     fun safeOnComplete(onComplete: () -> Unit): () -> Unit {
