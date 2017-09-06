@@ -10,7 +10,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.internal.functions.Functions
 import io.reactivex.subjects.CompletableSubject
-import java.util.*
+import io.reactivex.subjects.PublishSubject
 
 open class RxBasePresenter<V> : ExtBasePresenter<V>() {
 
@@ -25,6 +25,7 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
     private val activeTasks = LinkedHashMap<String, Task>()
     private val resetTaskStateActionMap = LinkedHashMap<String, () -> Unit>()
     private var isSavedState = false
+    private val detachViewActionList = mutableListOf<() -> Unit>()
 
     inner class Task(val key: String) {
         private val subTaskList = ArrayList<Disposable>()
@@ -87,6 +88,12 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
             val taskKeyList = savedState.getStringArrayList("task_keys")
             taskKeyList.forEach { resetTaskState(it) }
         }
+    }
+
+    override fun onDetachedView() {
+        super.onDetachedView()
+        detachViewActionList.forEach { it() }
+        detachViewActionList.clear()
     }
 
     /** Preserves link for task by key while it's running  */
@@ -229,7 +236,33 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
         }
     }
 
-    fun checkMainThread(message: String = "Must be called from main thread") {
+    fun <T> Observable<T>.takeUntilDetachView(presenter: RxBasePresenter<*>): Observable<T> {
+        checkMainThread()
+        return if(presenter.view == null) {
+            takeUntil(Observable.just(Unit))
+        } else {
+            val disposeSubject = PublishSubject.create<Unit>()
+            presenter.detachViewActionList.add({
+                disposeSubject.onNext(Unit)
+            })
+            takeUntil(disposeSubject)
+        }
+    }
+
+    fun <T> Single<T>.takeUntilDetachView(presenter: RxBasePresenter<*>): Single<T> {
+        checkMainThread()
+        return if(presenter.view == null) {
+            takeUntil(Single.just(Unit))
+        } else {
+            val disposeSubject = PublishSubject.create<Unit>()
+            presenter.detachViewActionList.add({
+                disposeSubject.onNext(Unit)
+            })
+            takeUntil(disposeSubject.firstOrError())
+        }
+    }
+
+    fun checkMainThread(message: String = "Must be called in main thread") {
         if(Looper.myLooper() != Looper.getMainLooper()) {
             throw IllegalStateException(message)
         }

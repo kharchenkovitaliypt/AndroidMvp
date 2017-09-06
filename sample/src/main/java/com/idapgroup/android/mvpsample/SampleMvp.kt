@@ -9,6 +9,7 @@ interface SampleMvp {
     interface Presenter : MvpPresenter<View> {
         fun onAsk(question: String)
         fun onConfirm()
+        fun takeUntilDetachView()
     }
 
     interface View : LoadView, RawErrorView {

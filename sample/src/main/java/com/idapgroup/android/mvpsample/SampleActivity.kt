@@ -21,6 +21,9 @@ class SampleActivity : BasePresenterActivity<SampleMvp.View, SampleMvp.Presenter
             presenter.onAsk(question.toString())
         }
         findViewById(R.id.confirm).setOnClickListener { presenter.onConfirm() }
+        findViewById(R.id.takeUntilDetachView).setOnClickListener {
+            presenter.takeUntilDetachView()
+        }
 
         if (savedInstanceState != null) {
             if(savedInstanceState.getBoolean("load_dialog_shown", false)) {
