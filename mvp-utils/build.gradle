@@ -25,27 +25,18 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-
     compile project(":mvp")
-    compile 'io.reactivex.rxjava2:rxjava:2.1.1'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.3'
 
-//    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-//        exclude group: 'com.android.support', module: 'support-annotations'
-//    })
-//    testCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
+    testCompile "org.robolectric:robolectric:3.3.2"
+    testCompile "org.hamcrest:hamcrest-library:1.3"
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    androidTestCompile "com.android.support.test:rules:1.0.1"
+    androidTestCompile "org.hamcrest:hamcrest-library:1.3"
 }
-
-//task generateJavadocs(type: Javadoc) {
-//    source = android.sourceSets.main.java.srcDirs
-//    classpath += project.files(android.getBootClasspath()
-//            .join(File.pathSeparator))
-//}
-//task generateJavadocsJar(type: Jar) {
-//    from generateJavadocs.destinationDir
-//    classifier 'javadoc'
-//}
-//generateJavadocsJar.dependsOn generateJavadocs
 
 task generateSourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs

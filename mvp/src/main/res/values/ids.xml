@@ -5,4 +5,6 @@
     <item type="id" name="errorContainer" />
     <item type="id" name="errorMessage" />
     <item type="id" name="errorRetry" />
+
+    <item type="id" name="viewHandlerList" />
 </resources>

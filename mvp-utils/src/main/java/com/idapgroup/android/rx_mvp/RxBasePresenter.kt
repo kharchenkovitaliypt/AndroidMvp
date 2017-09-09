@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.idapgroup.android.mvp.impl.ExtBasePresenter
+import com.idapgroup.android.mvp.impl.Action
+import com.idapgroup.android.mvp.impl.BasePresenter
 import io.reactivex.*
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -12,18 +13,15 @@ import io.reactivex.internal.functions.Functions
 import io.reactivex.subjects.CompletableSubject
 import java.util.*
 
-open class RxBasePresenter<V> : ExtBasePresenter<V>() {
+open class RxBasePresenter<V> : BasePresenter<V>() {
 
     // Optimization for safe subscribe
     private val ERROR_CONSUMER: (Throwable) -> Unit = { Functions.ERROR_CONSUMER.accept(it) }
-    private val EMPTY_ACTION: () -> Unit = {}
-    private val COMPLETED = CompletableSubject.create().apply {
-        onComplete()
-    }
+    private val EMPTY_ACTION: Action = {}
 
     private val handler = Handler(Looper.getMainLooper())
     private val activeTasks = LinkedHashMap<String, Task>()
-    private val resetTaskStateActionMap = LinkedHashMap<String, () -> Unit>()
+    private val resetTaskStateActionMap = LinkedHashMap<String, Action>()
     private var isSavedState = false
 
     inner class Task(val key: String) {
@@ -70,7 +68,7 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
         }
 
         fun await(activeSubTaskList: List<Disposable>): Completable {
-            return if(activeSubTaskList.isEmpty()) COMPLETED else completable
+            return if(activeSubTaskList.isEmpty()) Completable.complete() else completable
         }
     }
 
@@ -147,13 +145,13 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
         return task
     }
 
-    protected fun setResetTaskStateAction(key: String, resetAction: () -> Unit) {
+    protected fun setResetTaskStateAction(key: String, resetAction: Action) {
         resetTaskStateActionMap.put(key, resetAction)
     }
 
     protected fun cancelTask(taskKey: String): Completable {
         checkMainThread()
-        val task = activeTasks[taskKey] ?: return COMPLETED
+        val task = activeTasks[taskKey] ?: return Completable.complete()
         activeTasks.remove(taskKey)
         val completable = task.cancel()
         resetTaskState(taskKey)
@@ -161,7 +159,7 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
     }
 
     protected fun awaitTask(taskKey: String): Completable {
-        return activeTasks[taskKey]?.await() ?: return COMPLETED
+        return activeTasks[taskKey]?.await() ?: return Completable.complete()
     }
 
     protected fun isTaskActive(taskKey: String): Boolean {
@@ -182,7 +180,7 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
     fun <T> Observable<T>.safeSubscribe(
             onNext: (T) -> Unit,
             onError: (Throwable) -> Unit = ERROR_CONSUMER,
-            onComplete: () -> Unit = EMPTY_ACTION
+            onComplete: Action = EMPTY_ACTION
     ): Disposable {
         return subscribe(safeOnItem(onNext), safeOnError(onError), safeOnComplete(onComplete))
     }
@@ -195,7 +193,7 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
     }
 
     fun Completable.safeSubscribe(
-            onComplete: () -> Unit,
+            onComplete: Action,
             onError: (Throwable) -> Unit = ERROR_CONSUMER
     ): Disposable {
         return subscribe({ execute(onComplete) }, safeOnError(onError))
@@ -204,7 +202,7 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
     fun <T> Maybe<T>.safeSubscribe(
             onSuccess: (T) -> Unit,
             onError: (Throwable) -> Unit = ERROR_CONSUMER,
-            onComplete: () -> Unit = EMPTY_ACTION
+            onComplete: Action = EMPTY_ACTION
     ): Disposable {
         return subscribe(safeOnItem(onSuccess), safeOnError(onError), safeOnComplete(onComplete))
     }
@@ -213,7 +211,7 @@ open class RxBasePresenter<V> : ExtBasePresenter<V>() {
         return { item -> execute { onItem(item) } }
     }
 
-    fun safeOnComplete(onComplete: () -> Unit): () -> Unit {
+    fun safeOnComplete(onComplete: Action): () -> Unit {
         if(onComplete == EMPTY_ACTION) {
             return EMPTY_ACTION
         } else {

@@ -1,127 +1,107 @@
-//package com.idapgroup.android.mvp.impl
-//
-//import android.support.test.InstrumentationRegistry.getInstrumentation
-//import android.support.test.rule.ActivityTestRule
-//import android.support.v7.app.AppCompatActivity
-//import com.idapgroup.android.mvp.impl.BasePresenter
-//import com.idapgroup.android.mvp.impl.BasePresenterFragment
-//import com.idapgroup.android.mvp.tmpPresenterDelegatesStorage
-//import junit.framework.Assert.assertNotSame
-//import org.hamcrest.core.Is
-//import org.junit.Assert.assertThat
-//import org.junit.Rule
-//import org.junit.Test
-//
-//class BasePresenterFragmentTest {
-//
-//    @get:Rule val activityRule = ActivityTestRule(MockActivity::class.java)
-//    val activity: AppCompatActivity
-//            get() = activityRule.activity
-//
-//    @Test fun testRestoreAddedFragmentRetainedPresenters() {
-//        // Because tmpPresenterDelegatesStorage is static
-//        synchronized(tmpPresenterDelegatesStorage) {
-//
-//            val originalPresenter1 = MockMvpPresenter()
-//            val originalPresenter2 = MockMvpPresenter()
-//            val originalPresenter3 = MockMvpPresenter()
-//
-//            activity.runOnUiThread {
-//                activity.addFragment(MockBasePresenterFragment(originalPresenter1), "fragment_1")
-//                activity.addFragment(MockBasePresenterFragment(originalPresenter2), "fragment_2")
-//                activity.addFragment(MockBasePresenterFragment(originalPresenter3), "fragment_3")
-//
-//            }
-//            getInstrumentation().waitForIdleSync()
-//
-//            activity.runOnUiThread {
-//                activity.recreate()
-//                assert(tmpPresenterDelegatesStorage.isEmpty())
-//
-//                checkMockPresenter(activity, "fragment_1", originalPresenter1)
-//                checkMockPresenter(activity, "fragment_2", originalPresenter2)
-//                checkMockPresenter(activity, "fragment_3", originalPresenter3)
-//            }
-//            getInstrumentation().waitForIdleSync()
-//        }
-//    }
-//
-//    @Test fun testRestoreHiddenFragmentRetainedPresenter() {
-//        // Because tmpPresenterDelegatesStorage is static
-//        synchronized(tmpPresenterDelegatesStorage) {
-//
-//            val originalPresenter1 = MockMvpPresenter()
-//            val originalFragment1 = MockBasePresenterFragment(originalPresenter1)
-//
-//            val originalPresenter2 = MockMvpPresenter()
-//            val originalFragment2 = MockBasePresenterFragment(originalPresenter2)
-//
-//            activity.runOnUiThread {
-//                activity.addFragment(originalFragment1, "fragment_1")
-//                activity.hideFragment(originalFragment1)
-//                activity.addFragment(originalFragment2, "fragment_2")
-//                activity.hideFragment(originalFragment2)
-//            }
-//            getInstrumentation().waitForIdleSync()
-//
-//            activity.runOnUiThread {
-//                activity.recreate()
-//                assert(tmpPresenterDelegatesStorage.isEmpty())
-//
-//                checkMockPresenter(activity, "fragment_1", originalPresenter1)
-//                checkMockPresenter(activity, "fragment_2", originalPresenter2)
-//            }
-//            getInstrumentation().waitForIdleSync()
-//        }
-//    }
-//
-//    @Test fun testRestoreReplacedFragmentRetainedPresenters() {
-//        // Because tmpPresenterDelegatesStorage is static
-//        synchronized(tmpPresenterDelegatesStorage) {
-//            val originalPresenter1 = MockMvpPresenter()
-//            val originalPresenter2 = MockMvpPresenter()
-//            val originalPresenter3 = MockMvpPresenter()
-//
-//            activity.runOnUiThread {
-//                activity.addFragment(fragment = MockBasePresenterFragment(originalPresenter1), tag = "fragment_1")
-//                activity.replaceFragment(fragment = MockBasePresenterFragment(originalPresenter2),
-//                        tag = "fragment_2", addToBackStack = true)
-//                activity.replaceFragment(fragment = MockBasePresenterFragment(originalPresenter3),
-//                        tag = "fragment_3", addToBackStack = true)
-//            }
-//            getInstrumentation().waitForIdleSync()
-//
-//            activity.runOnUiThread {
-//                activity.recreate()
-//                assert(tmpPresenterDelegatesStorage.isEmpty())
-//
-//                checkMockPresenter(activity, "fragment_1", originalPresenter1)
-//                checkMockPresenter(activity, "fragment_2", originalPresenter2)
-//                checkMockPresenter(activity, "fragment_3", originalPresenter3)
-//            }
-//            getInstrumentation().waitForIdleSync()
-//        }
-//    }
-//
-//    fun checkMockPresenter(activity: AppCompatActivity,
-//                           recreatedFragmentTag: String, originPresenter: MockMvpPresenter) {
-//        val recreatedFragment = activity.getFragment(recreatedFragmentTag);
-//        assertNotSame(recreatedFragment, originPresenter)
-//        assertThat((recreatedFragment as MockBasePresenterFragment).presenter, Is.`is`(originPresenter))
-//    }
-//
-//    class MockBasePresenterFragment constructor(val mockPresenter: MockMvpPresenter?)
-//        : BasePresenterFragment<MockMvpView, MockMvpPresenter>() {
-//
-//        constructor() : this(null)
-//
-//        /** if fragment restored must be never be called */
-//        override fun onCreatePresenter() = mockPresenter as MockMvpPresenter
-//    }
-//
-//    class MockMvpPresenter : BasePresenter<MockMvpView>()
-//
-//    class MockMvpView
-//}
-//
-//class MockActivity : AppCompatActivity()
+package com.idapgroup.android.mvp.impl
+
+import android.os.Bundle
+import android.support.test.rule.ActivityTestRule
+import android.support.test.runner.AndroidJUnitRunner
+import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
+import com.idapgroup.android.mvp.impl.v2.getPresenter
+import com.idapgroup.android.mvp.impl.v2.retainedPresenters
+import org.junit.Rule
+import org.junit.Test
+
+class BasePresenterFragmentTest : AndroidJUnitRunner() {
+
+    @get:Rule
+    val activityRule = ActivityTestRule(MockActivity::class.java)
+    val activity get() = activityRule.activity!!
+
+    val presenter1 = MockPresenter()
+    val fragment1 = MockFragment("fragment_1", presenter1)
+
+    val presenter2 = MockPresenter()
+    val fragment2 = MockFragment("fragment_2", presenter2)
+
+    val presenter3 = MockPresenter()
+    val fragment3 = MockFragment("fragment_3", presenter3)
+    
+    val allFragments = arrayOf(fragment1, fragment2, fragment3)
+
+    @Test fun testRestoreAddedFragmentPresenter() {
+        waitForIdleSyncAfter {
+            allFragments.forEach {
+                activity.addFragment(it, it.key!!)
+            }
+        }
+        checkRetainedPresenters(*allFragments)
+    }
+
+    @Test fun testRestoreHiddenFragmentPresenter() {
+        waitForIdleSyncAfter {
+            activity.addFragment(fragment1, fragment1.key!!)
+            activity.hideFragment(fragment1)
+            activity.addFragment(fragment2, fragment2.key!!)
+            activity.hideFragment(fragment2)
+        }
+        checkRetainedPresenters(fragment1, fragment2)
+    }
+
+    @Test fun testRestoreReplacedFragmentPresenter() {
+        waitForIdleSyncAfter {
+            activity.addFragment(fragment1, fragment1.key!!)
+            activity.replaceFragment(fragment2, fragment2.key!!, addToBackStack = true)
+            activity.replaceFragment(fragment3, fragment3.key!!, addToBackStack = true)
+        }
+        checkRetainedPresenters(fragment1, afterRecreate = { activity ->
+            assert(retainedPresenters.size == 2)
+            activity.popBackStack()
+            assert(retainedPresenters.size == 1)
+            activity.popBackStack()
+        })
+    }
+
+    fun checkRetainedPresenters(vararg fragments: MockFragment,
+                                afterRecreate: (AppCompatActivity) -> Unit = {}) {
+        waitForIdleSyncAfter {
+            activity.recreate()
+        }
+        val curActivity = currentActivity
+        waitForIdleSyncAfter {
+            afterRecreate(curActivity)
+        }
+        waitForIdleSyncAfter {
+            assert(retainedPresenters.isEmpty())
+        }
+        checkPresentersEquality(*fragments)
+    }
+
+    fun checkPresentersEquality(vararg fragments: MockFragment) {
+        val curActivity = currentActivity
+        waitForIdleSyncAfter {
+            fragments.forEach {
+                val recreatedFragment = curActivity.getFragment(it.key!!)
+                val recreatedPresenter = (recreatedFragment as MockFragment).presenter
+                assert(recreatedFragment !== it)
+                assert(recreatedPresenter == it.presenter!!)
+            }
+        }
+    }
+
+    class MockFragment constructor(
+            val key: String? = null,
+            val presenter: MockPresenter? = null
+    ) : Fragment(), MockMvpView {
+
+        private lateinit var p: MockPresenter
+
+        override fun onCreate(savedState: Bundle?) {
+            super.onCreate(savedState)
+
+            p = getPresenter(
+                    this, this, { presenter!! },
+                    true, savedState)
+        }
+    }
+}
+
+

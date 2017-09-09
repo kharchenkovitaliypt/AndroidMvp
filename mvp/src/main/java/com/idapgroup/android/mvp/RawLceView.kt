@@ -1,11 +1,12 @@
 package com.idapgroup.android.mvp
 
-/** Interface representing a View with three states(loading, contentView, error)  */
-interface RawLceView : RawErrorView {
+/** Represents view with three states(load, content, raw error with retry)  */
+interface RawLceView : LcView {
 
-    /** Show a view with a loadView bar indicating a loading process  */
-    fun showLoad()
-
-    /** Show a view with a contentView  */
-    fun showContent()
+    /**
+     * Show an error message with retry ability
+     * @param error Raw error
+     * @param retry Retry action
+     */
+    fun showError(error: Throwable, retry: (() -> Unit)? = null)
 }
