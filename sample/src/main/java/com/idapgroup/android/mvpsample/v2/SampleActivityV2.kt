@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.widget.TextView
+import com.idapgroup.android.mvp.impl.v2.Retain
 import com.idapgroup.android.mvp.impl.v2.attachPresenter
 import com.idapgroup.android.mvpsample.R
 import com.idapgroup.android.mvpsample.SampleMvp
@@ -26,8 +27,7 @@ open class SampleActivityV2 : AppCompatActivity() {
         }
         findViewById(R.id.confirm).setOnClickListener { presenter.onConfirm() }
 
-        presenter = attachPresenter(this, presenterView, ::SamplePresenter,
-                retain = true, savedState = savedState)
+        presenter = attachPresenter(this, presenterView, ::SamplePresenter, Retain(savedState))
 
         savedState?.let {
             if(it.getBoolean("load_dialog_shown", false)) {

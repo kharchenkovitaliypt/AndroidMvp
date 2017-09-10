@@ -5,6 +5,7 @@ import com.idapgroup.android.mvp.RawLceView
 import com.idapgroup.android.mvp.impl.LceViewHandler
 import com.idapgroup.android.mvp.impl.createLceViewCreator
 import com.idapgroup.android.mvp.impl.setContentView
+import com.idapgroup.android.mvp.impl.v2.Retain
 import com.idapgroup.android.mvp.impl.v2.attachPresenter
 import com.idapgroup.android.mvpsample.R
 import com.idapgroup.android.mvpsample.SampleLceMvp
@@ -18,9 +19,7 @@ class SampleLceActivityV2(
 
     override fun onCreate(savedState: Bundle?) {
         super.onCreate(savedState)
-        presenter = attachPresenter(
-                this, this, ::SampleLcePresenter,
-                retain = true, savedState = savedState)
+        presenter = attachPresenter(this, this, ::SampleLcePresenter, Retain(savedState))
     }
 
     override fun onInitView() {

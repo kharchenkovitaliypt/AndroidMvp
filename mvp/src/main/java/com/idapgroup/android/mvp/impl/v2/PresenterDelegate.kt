@@ -17,8 +17,7 @@ interface PresenterDelegate<in V, out P : MvpPresenter<V>> {
 
 internal class PresenterDelegateImpl<in V, out P : MvpPresenter<V>>(
         createPresenter : () -> P,
-        private val retain: Boolean = false,
-        savedState: Bundle? = null,
+        private val retain: Retain? = null,
         private val retainId: String? = null
 ) : PresenterDelegate<V, P> {
 
@@ -26,7 +25,7 @@ internal class PresenterDelegateImpl<in V, out P : MvpPresenter<V>>(
     var created = false
 
     init {
-        val savedFragmentId = savedState?.getString(KEY_RETAINED_ID)
+        val savedFragmentId = retain?.savedState?.getString(KEY_RETAINED_ID)
         if (savedFragmentId != null && retainedPresenters.isNotEmpty()) {
             // Restore previously preserved presenter when configuration changed
             @Suppress("UNCHECKED_CAST")
@@ -35,7 +34,7 @@ internal class PresenterDelegateImpl<in V, out P : MvpPresenter<V>>(
         } else {
             presenter = createPresenter()
         }
-        savedState?.let { onRestoreState(it) }
+        retain?.savedState?.let { onRestoreState(it) }
         onCreate()
     }
 
@@ -49,7 +48,7 @@ internal class PresenterDelegateImpl<in V, out P : MvpPresenter<V>>(
     fun onSaveState(outState: Bundle) {
         presenter.onSaveState(outState)
         outState.putBoolean(KEY_DELEGATE_CREATED, created)
-        if(retain) {
+        if(retain != null) {
             // Tmp retain presenter on configuration change time
             outState.putString(KEY_RETAINED_ID, retainId!!)
             retainedPresenters.put(retainId, presenter)
