@@ -9,11 +9,11 @@ import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 
 
-fun FragmentActivity.addFragment(fragment: Fragment, tag: String) {
+fun FragmentActivity.addFragment(fragment: Fragment, tag: String? = null) {
     commitTransaction { it.add(android.R.id.content, fragment, tag) }
 }
 
-fun FragmentActivity.replaceFragment(fragment: Fragment, tag: String, addToBackStack: Boolean = false) {
+fun FragmentActivity.replaceFragment(fragment: Fragment, tag: String? = null, addToBackStack: Boolean = false) {
     commitTransaction {
         it.replace(android.R.id.content, fragment, tag).apply {
             if(addToBackStack) addToBackStack(null)

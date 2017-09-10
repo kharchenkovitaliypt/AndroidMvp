@@ -2,7 +2,7 @@
 package com.idapgroup.android.mvp.impl.v2
 
 import android.app.Activity
-import android.app.Application
+import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -15,24 +15,24 @@ enum class LifecyclePair {
 }
 
 @JvmOverloads
-fun <V, P: MvpPresenter<V>> getPresenter(
+fun <V, P: MvpPresenter<V>> attachPresenter(
         activity: Activity,
         view: V,
         createPresenter: () -> P,
-        retained: Boolean = false,
+        retain: Boolean = false,
         savedState: Bundle? = null,
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
 ): P {
-    return getPresenterDelegate(
+    return attachPresenterDelegate(
             activity, view, createPresenter,
-            retained, savedState,
+            retain, savedState,
             manualHandleView, lifecyclePair
     ).presenter
 }
 
 @JvmOverloads
-fun <V, P: MvpPresenter<V>> getPresenterDelegate(
+fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
         activity: Activity,
         view: V,
         createPresenter: () -> P,
@@ -44,47 +44,48 @@ fun <V, P: MvpPresenter<V>> getPresenterDelegate(
 
     val retainedId: String = activity.javaClass.name + activity.hashCode()
     val delegate = PresenterDelegateImpl(createPresenter, retained, savedState, retainedId)
-
-    activity.application.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
+    if(!manualHandleView && lifecyclePair === CREATE_DESTROY_VIEW) {
+        delegate.attachView(view)
+    }
+    val lifecycleCallbacks = object : ActivityLifecycleCallbacks {
 
         override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
 
         override fun onActivitySaveInstanceState(a: Activity, outState: Bundle) {
-            if(a === activity) {
-                delegate.onSaveState(outState)
-            }
+            delegate.onSaveState(outState)
         }
         override fun onActivityStarted(a: Activity) {
-            if(a === activity && lifecyclePair === START_STOP) {
+            if(!manualHandleView && lifecyclePair === START_STOP) {
                 delegate.attachView(view)
             }
         }
         override fun onActivityResumed(a: Activity) {
-            if(a === activity && !manualHandleView && lifecyclePair === RESUME_PAUSE) {
+            if(!manualHandleView && lifecyclePair === RESUME_PAUSE) {
                 delegate.attachView(view)
             }
         }
         override fun onActivityPaused(a: Activity) {
-            if(a === activity && !manualHandleView && lifecyclePair === RESUME_PAUSE) {
+            if(!manualHandleView && lifecyclePair === RESUME_PAUSE) {
                 delegate.detachView()
             }
         }
         override fun onActivityStopped(a: Activity) {
-            if(a === activity && !manualHandleView && lifecyclePair === START_STOP) {
+            if(!manualHandleView && lifecyclePair === START_STOP) {
                 delegate.detachView()
             }
         }
         override fun onActivityDestroyed(a: Activity) {
-            if(a === activity && !manualHandleView && lifecyclePair === CREATE_DESTROY_VIEW) {
+            if(!manualHandleView && lifecyclePair === CREATE_DESTROY_VIEW) {
                 delegate.detachView()
             }
         }
-    })
+    }
+    activity.application.registerActivityLifecycleCallbacks(lifecycleCallbacks.filter(activity))
     return  PresenterDelegateChecker(delegate, manualHandleView)
 }
 
 @JvmOverloads
-fun <V, P: MvpPresenter<V>> getPresenter(
+fun <V, P: MvpPresenter<V>> attachPresenter(
         fragment: Fragment,
         view: V,
         createPresenter: () -> P,
@@ -93,7 +94,7 @@ fun <V, P: MvpPresenter<V>> getPresenter(
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
 ): P {
-    return getPresenterDelegate(
+    return attachPresenterDelegate(
             fragment, view, createPresenter,
             retained, savedState,
             manualHandleView, lifecyclePair
@@ -101,59 +102,56 @@ fun <V, P: MvpPresenter<V>> getPresenter(
 }
 
 @JvmOverloads
-fun <V, P: MvpPresenter<V>> getPresenterDelegate(
+fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
         fragment: Fragment,
         view: V,
         createPresenter: () -> P,
-        retained: Boolean = false,
+        retain: Boolean = false,
         savedState: Bundle? = null,
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
 ): PresenterDelegate<V, P> {
 
     val retainedId = fragment.javaClass.name + fragment.hashCode()
-    val delegate = PresenterDelegateImpl(createPresenter, retained, savedState, retainedId)
+    val delegate = PresenterDelegateImpl(createPresenter, retain, savedState, retainedId)
+    if(!manualHandleView && lifecyclePair === CREATE_DESTROY_VIEW) {
+        delegate.attachView(view)
+    }
+    val lifecycleCallbacks = object : FragmentManager.FragmentLifecycleCallbacks() {
 
+        override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View?, savedInstanceState: Bundle?) {}
+
+        override fun onFragmentSaveInstanceState(fm: FragmentManager, f: Fragment, outState: Bundle) {
+            delegate.onSaveState(outState)
+        }
+        override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
+            if(!manualHandleView && lifecyclePair === START_STOP) {
+                delegate.attachView(view)
+            }
+        }
+        override fun onFragmentResumed(fm: FragmentManager, f: Fragment?) {
+            if(!manualHandleView && lifecyclePair === RESUME_PAUSE) {
+                delegate.attachView(view)
+            }
+        }
+        override fun onFragmentPaused(fm: FragmentManager, f: Fragment?) {
+            if(!manualHandleView && lifecyclePair === RESUME_PAUSE) {
+                delegate.detachView()
+            }
+        }
+        override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
+            if(!manualHandleView && lifecyclePair === START_STOP) {
+                delegate.detachView()
+            }
+        }
+        override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
+            if(!manualHandleView && lifecyclePair === CREATE_DESTROY_VIEW) {
+                delegate.detachView()
+            }
+        }
+    }
     fragment.fragmentManager.registerFragmentLifecycleCallbacks(
-            object : FragmentManager.FragmentLifecycleCallbacks() {
-                override fun onFragmentSaveInstanceState(fm: FragmentManager, f: Fragment, outState: Bundle) {
-                    if(f === fragment) {
-                        delegate.onSaveState(outState)
-                    }
-                }
-                override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View?, savedInstanceState: Bundle?) {
-                    if(f === fragment && !manualHandleView && lifecyclePair === CREATE_DESTROY_VIEW) {
-                        delegate.attachView(view)
-                    }
-                }
-                override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
-                    if(f === fragment && !manualHandleView && lifecyclePair === START_STOP) {
-                        delegate.attachView(view)
-                    }
-                }
-                override fun onFragmentResumed(fm: FragmentManager, f: Fragment?) {
-                    if(f === fragment && !manualHandleView && lifecyclePair === RESUME_PAUSE) {
-                        delegate.attachView(view)
-                    }
-                }
-                override fun onFragmentPaused(fm: FragmentManager, f: Fragment?) {
-                    if(f === fragment && !manualHandleView && lifecyclePair === RESUME_PAUSE) {
-                        delegate.detachView()
-                    }
-                }
-                override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
-                    if(f === fragment && !manualHandleView && lifecyclePair === START_STOP) {
-                        delegate.detachView()
-                    }
-                }
-                override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
-                    if(f === fragment && !manualHandleView && lifecyclePair === CREATE_DESTROY_VIEW) {
-                        delegate.detachView()
-                    }
-                }
-
-    }, false)
-
+            lifecycleCallbacks.filter(fragment), false)
     return PresenterDelegateChecker(delegate, manualHandleView)
 }
 

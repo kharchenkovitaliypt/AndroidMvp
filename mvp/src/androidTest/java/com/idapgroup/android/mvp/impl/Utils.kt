@@ -10,8 +10,8 @@ fun waitForIdleSyncAfter(action: () -> Unit) {
     }
 }
 
-class MockActivity : AppCompatActivity()
+class TestActivity : AppCompatActivity()
 
-class MockPresenter : BasePresenter<MockMvpView>()
+class TestPresenter : BasePresenter<TestMvpView>()
 
-interface MockMvpView
+interface TestMvpView

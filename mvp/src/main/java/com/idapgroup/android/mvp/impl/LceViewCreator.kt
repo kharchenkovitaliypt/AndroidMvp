@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.idapgroup.android.mvp.R
+import com.idapgroup.android.mvp.impl.DefaultLceViewCreator.Layout
 
 typealias ViewCreator = (inflater: LayoutInflater, container: ViewGroup) -> View
 
@@ -13,6 +14,16 @@ interface LceViewCreator {
     fun onCreateErrorView(inflater: LayoutInflater, container: ViewGroup) : View
     fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
 }
+
+fun createLceViewCreator(
+        @LayoutRes contentRes: Int,
+        @LayoutRes loadRes: Int = Layout.LOAD,
+        @LayoutRes errorRes: Int = Layout.ERROR
+) = SimpleLceViewCreator(
+        createViewCreator(contentRes),
+        createViewCreator(loadRes),
+        createViewCreator(errorRes)
+)
 
 open class SimpleLceViewCreator(
         val createContentView: ViewCreator,

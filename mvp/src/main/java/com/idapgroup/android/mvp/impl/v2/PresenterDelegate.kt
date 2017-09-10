@@ -17,9 +17,9 @@ interface PresenterDelegate<in V, out P : MvpPresenter<V>> {
 
 internal class PresenterDelegateImpl<in V, out P : MvpPresenter<V>>(
         createPresenter : () -> P,
-        private val retained: Boolean = false,
+        private val retain: Boolean = false,
         savedState: Bundle? = null,
-        private val retainedId: String? = null
+        private val retainId: String? = null
 ) : PresenterDelegate<V, P> {
 
     override val presenter: P
@@ -49,10 +49,10 @@ internal class PresenterDelegateImpl<in V, out P : MvpPresenter<V>>(
     fun onSaveState(outState: Bundle) {
         presenter.onSaveState(outState)
         outState.putBoolean(KEY_DELEGATE_CREATED, created)
-        if(retained) {
-            // Tmp preserve presenter when configuration change
-            outState.putString(KEY_RETAINED_ID, retainedId!!)
-            retainedPresenters.put(retainedId, presenter)
+        if(retain) {
+            // Tmp retain presenter on configuration change time
+            outState.putString(KEY_RETAINED_ID, retainId!!)
+            retainedPresenters.put(retainId, presenter)
         }
     }
 

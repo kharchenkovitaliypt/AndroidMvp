@@ -1,14 +1,11 @@
 package com.idapgroup.android.mvpsample
 
-import com.idapgroup.android.mvp.LceView
+import com.idapgroup.android.mvp.MvpPresenter
+import com.idapgroup.android.mvp.RawLceView
 
 interface SampleLceMvp {
 
-    interface Presenter : SampleMvp.Presenter {
-        fun onRetry()
-    }
+    interface Presenter : MvpPresenter<View>
 
-    interface View : SampleMvp.View, LceView {
-        fun showLceLoad()
-    }
+    interface View : RawLceView
 }
