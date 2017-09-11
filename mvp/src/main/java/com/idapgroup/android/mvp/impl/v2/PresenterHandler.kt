@@ -14,20 +14,19 @@ enum class LifecyclePair {
     CREATE_DESTROY_VIEW, START_STOP, RESUME_PAUSE
 }
 
-class Retain(val savedState: Bundle? = null)
-
 @JvmOverloads
 fun <V, P: MvpPresenter<V>> attachPresenter(
         activity: Activity,
         view: V,
         createPresenter: () -> P,
-        retain: Retain? = null,
+        savedState: Bundle? = null,
+        retain: Boolean = false,
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
 ): P {
     return attachPresenterDelegate(
             activity, view, createPresenter,
-            retain,
+            savedState, retain,
             manualHandleView, lifecyclePair
     ).presenter
 }
@@ -37,13 +36,15 @@ fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
         activity: Activity,
         view: V,
         createPresenter: () -> P,
-        retain: Retain? = null,
+        savedState: Bundle? = null,
+        retain: Boolean = false,
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
 ): PresenterDelegate<V, P> {
 
     val retainedId: String = activity.javaClass.name + activity.hashCode()
-    val delegate = PresenterDelegateImpl(createPresenter, retain, retainedId)
+    val delegate = PresenterDelegateImpl(createPresenter, savedState, retain, retainedId)
+
     if(!manualHandleView && lifecyclePair === CREATE_DESTROY_VIEW) {
         delegate.attachView(view)
     }
@@ -89,13 +90,14 @@ fun <V, P: MvpPresenter<V>> attachPresenter(
         fragment: Fragment,
         view: V,
         createPresenter: () -> P,
-        retain: Retain? = null,
+        savedState: Bundle? = null,
+        retain: Boolean = false,
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
 ): P {
     return attachPresenterDelegate(
             fragment, view, createPresenter,
-            retain,
+            savedState, retain,
             manualHandleView, lifecyclePair
     ).presenter
 }
@@ -105,13 +107,14 @@ fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
         fragment: Fragment,
         view: V,
         createPresenter: () -> P,
-        retain: Retain? = null,
+        savedState: Bundle? = null,
+        retain: Boolean = false,
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
 ): PresenterDelegate<V, P> {
 
     val retainedId = fragment.javaClass.name + fragment.hashCode()
-    val delegate = PresenterDelegateImpl(createPresenter, retain, retainedId)
+    val delegate = PresenterDelegateImpl(createPresenter, savedState, retain, retainedId)
     if(!manualHandleView && lifecyclePair === CREATE_DESTROY_VIEW) {
         delegate.attachView(view)
     }

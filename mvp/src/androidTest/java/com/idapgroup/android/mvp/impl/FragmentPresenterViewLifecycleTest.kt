@@ -15,12 +15,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FragmentPresenterViewLifecycleTest {
 
-    class TestView
-
-    class TestPresenter : BasePresenter<TestView>() {
-        val isViewAttached get() = view != null
-    }
-
     @get:Rule
     val activityRule = ActivityTestRule(TestActivity::class.java)
 
@@ -41,95 +35,104 @@ class FragmentPresenterViewLifecycleTest {
             activityRule.activity.addFragment(fragment)
         }
         waitForIdleSyncAfter {
-            activityRule.activity.removeFragment(fragment)
+            activityRule.activity.recreate()
         }
     }
 
     class ResumePauseFragment : Fragment() {
 
-        val view = TestView()
-        lateinit var presenter: TestPresenter
+        val view = TestLifecycleView()
+        lateinit var presenter: TestLifecyclePresenter
 
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
+        override fun onCreate(savedState: Bundle?) {
+            super.onCreate(savedState)
+            val createPresenter = { TestLifecyclePresenter().apply {
+                restored = savedState != null
+            } }
             presenter = attachPresenter(
-                    this, view, ::TestPresenter, lifecyclePair = RESUME_PAUSE)
-            assertFalse(presenter.isViewAttached)
+                    this, view, createPresenter, savedState, false, lifecyclePair = RESUME_PAUSE)
+            assertFalse(presenter.isAttachedView)
         }
 
         override fun onResume() {
             super.onResume()
-            assertFalse(presenter.isViewAttached)
+            assertFalse(presenter.isAttachedView)
         }
         // attachView()
 
         override fun onPause() {
             super.onPause()
-            assertTrue(presenter.isViewAttached)
+            assertTrue(presenter.isAttachedView)
         }
         // detachView()
 
         override fun onStop() {
             super.onStop()
-            assertFalse(presenter.isViewAttached)
+            assertFalse(presenter.isAttachedView)
         }
     }
 
     class StartStopFragment : Fragment() {
 
-        val view = TestView()
-        lateinit var presenter: TestPresenter
+        val view = TestLifecycleView()
+        lateinit var presenter: TestLifecyclePresenter
 
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
+        override fun onCreate(savedState: Bundle?) {
+            super.onCreate(savedState)
+            val createPresenter = { TestLifecyclePresenter().apply {
+                restored = savedState != null
+            } }
             presenter = attachPresenter(
-                    this, view, ::TestPresenter, lifecyclePair = START_STOP)
+                    this, view, createPresenter, savedState, false, lifecyclePair = START_STOP)
         }
 
         override fun onStart() {
             super.onStart()
-            assertFalse(presenter.isViewAttached)
+            assertFalse(presenter.isAttachedView)
         }
         // attachView()
 
         override fun onResume() {
-            assertTrue(presenter.isViewAttached)
+            assertTrue(presenter.isAttachedView)
             super.onResume()
         }
 
         override fun onStop() {
             super.onStop()
-            assertTrue(presenter.isViewAttached)
+            assertTrue(presenter.isAttachedView)
         }
         // detachView()
 
         override fun onDestroyView() {
-            assertFalse(presenter.isViewAttached)
+            assertFalse(presenter.isAttachedView)
             super.onDestroyView()
         }
     }
 
     class CreateDestroyFragment : Fragment() {
 
-        val view = TestView()
-        lateinit var presenter: TestPresenter
+        val view = TestLifecycleView()
+        lateinit var presenter: TestLifecyclePresenter
 
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
+        override fun onCreate(savedState: Bundle?) {
+            super.onCreate(savedState)
+            val createPresenter = { TestLifecyclePresenter().apply {
+                restored = savedState != null
+            } }
             presenter = attachPresenter(
-                    this, view, ::TestPresenter, lifecyclePair = CREATE_DESTROY_VIEW)
+                    this, view, createPresenter, savedState, false, lifecyclePair = CREATE_DESTROY_VIEW)
             // attachView()
-            assertTrue(presenter.isViewAttached)
+            assertTrue(presenter.isAttachedView)
         }
 
         override fun onDestroyView() {
             super.onDestroyView()
-            assertTrue(presenter.isViewAttached)
+            assertTrue(presenter.isAttachedView)
         }
         // detachView()
 
         override fun onDestroy() {
-            assertFalse(presenter.isViewAttached)
+            assertFalse(presenter.isAttachedView)
             super.onDestroy()
         }
     }

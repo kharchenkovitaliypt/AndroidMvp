@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.test.rule.ActivityTestRule
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import com.idapgroup.android.mvp.impl.v2.Retain
 import com.idapgroup.android.mvp.impl.v2.attachPresenter
 import com.idapgroup.android.mvp.impl.v2.retainedPresenters
 import org.junit.Rule
@@ -96,7 +95,7 @@ class PresenterFragmentTest {
 
         override fun onCreate(savedState: Bundle?) {
             super.onCreate(savedState)
-            p = attachPresenter(this, this, { presenter!! }, Retain(savedState))
+            p = attachPresenter(this, this, { presenter!! }, savedState, true)
         }
     }
 }
