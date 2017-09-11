@@ -5,6 +5,7 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.support.v7.app.AppCompatActivity
 import com.idapgroup.android.mvp.impl.v2.LifecyclePair.*
+import com.idapgroup.android.mvp.impl.v2.MVP_STRICT_MODE
 import com.idapgroup.android.mvp.impl.v2.attachPresenter
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
@@ -18,6 +19,10 @@ import kotlin.properties.Delegates
 class TestLifecycleView
 
 class TestLifecyclePresenter : BasePresenter<TestLifecycleView>() {
+
+    init {
+        MVP_STRICT_MODE = true
+    }
 
     val isAttachedView get() = view != null && onAttachedView && !onDetachedView
 

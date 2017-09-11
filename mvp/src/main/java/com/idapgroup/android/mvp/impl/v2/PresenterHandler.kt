@@ -10,6 +10,8 @@ import android.view.View
 import com.idapgroup.android.mvp.MvpPresenter
 import com.idapgroup.android.mvp.impl.v2.LifecyclePair.*
 
+var MVP_STRICT_MODE = false
+
 enum class LifecyclePair {
     CREATE_DESTROY_VIEW, START_STOP, RESUME_PAUSE
 }
@@ -22,7 +24,7 @@ fun <V, P: MvpPresenter<V>> attachPresenter(
         savedState: Bundle? = null,
         retain: Boolean = false,
         manualHandleView: Boolean = false,
-        lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
+        lifecyclePair: LifecyclePair = START_STOP
 ): P {
     return attachPresenterDelegate(
             activity, view, createPresenter,
@@ -39,7 +41,7 @@ fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
         savedState: Bundle? = null,
         retain: Boolean = false,
         manualHandleView: Boolean = false,
-        lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
+        lifecyclePair: LifecyclePair = START_STOP
 ): PresenterDelegate<V, P> {
 
     val retainedId: String = activity.javaClass.name + activity.hashCode()
@@ -93,7 +95,7 @@ fun <V, P: MvpPresenter<V>> attachPresenter(
         savedState: Bundle? = null,
         retain: Boolean = false,
         manualHandleView: Boolean = false,
-        lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
+        lifecyclePair: LifecyclePair = START_STOP
 ): P {
     return attachPresenterDelegate(
             fragment, view, createPresenter,
@@ -110,7 +112,7 @@ fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
         savedState: Bundle? = null,
         retain: Boolean = false,
         manualHandleView: Boolean = false,
-        lifecyclePair: LifecyclePair = CREATE_DESTROY_VIEW
+        lifecyclePair: LifecyclePair = START_STOP
 ): PresenterDelegate<V, P> {
 
     val retainedId = fragment.javaClass.name + fragment.hashCode()
@@ -156,8 +158,8 @@ fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
     return PresenterDelegateChecker(delegate, manualHandleView)
 }
 
-internal class PresenterDelegateChecker<in V, out P: MvpPresenter<V>>(
-        val delegate: PresenterDelegate<V, P>,
+internal class PresenterDelegateChecker<V, out P: MvpPresenter<V>>(
+        val delegate: PresenterDelegateImpl<V, P>,
         val manualHandleView: Boolean
 ) : PresenterDelegate<V, P> by delegate {
 

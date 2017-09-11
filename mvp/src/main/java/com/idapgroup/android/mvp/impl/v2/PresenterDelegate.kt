@@ -1,6 +1,7 @@
 package com.idapgroup.android.mvp.impl.v2
 
 import android.os.Bundle
+import android.util.Log
 import com.idapgroup.android.mvp.MvpPresenter
 import java.util.*
 
@@ -15,7 +16,7 @@ interface PresenterDelegate<in V, out P : MvpPresenter<V>> {
     fun detachView()
 }
 
-internal class PresenterDelegateImpl<in V, out P : MvpPresenter<V>>(
+internal class PresenterDelegateImpl<V, out P : MvpPresenter<V>>(
         createPresenter : () -> P,
         savedState: Bundle? = null,
         private val retain: Boolean = false,
@@ -24,6 +25,7 @@ internal class PresenterDelegateImpl<in V, out P : MvpPresenter<V>>(
 
     override val presenter: P
     var created = false
+    var view: V? = null
 
     init {
         val savedFragmentId = savedState?.getString(KEY_RETAINED_ID)
@@ -62,12 +64,30 @@ internal class PresenterDelegateImpl<in V, out P : MvpPresenter<V>>(
     }
 
     override fun attachView(view: V) {
-        presenter.attachView(view)
-        presenter.onAttachedView(view)
+        if(this.view != null) {
+            if(MVP_STRICT_MODE) {
+                throw IllegalStateException("${this.view} is already attached")
+            } else {
+                Log.e("Presenter", "MvpPresenter.attachView() ${this.view} is attached")
+            }
+        } else {
+            this.view = view
+            presenter.attachView(view)
+            presenter.onAttachedView(view)
+        }
     }
 
     override fun detachView() {
-        presenter.onDetachedView()
-        presenter.detachView()
+        if(view == null) {
+            if(MVP_STRICT_MODE) {
+                throw IllegalStateException("$view is detached")
+            } else {
+                Log.e("Presenter", "MvpPresenter.detachView() $view is detached")
+            }
+        } else {
+            presenter.onDetachedView()
+            presenter.detachView()
+            this.view = null
+        }
     }
 }
