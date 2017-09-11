@@ -11,7 +11,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.internal.functions.Functions
 import io.reactivex.subjects.CompletableSubject
-import io.reactivex.subjects.PublishSubject
+import java.util.*
 
 open class RxBasePresenter<V> : BasePresenter<V>() {
 
@@ -19,11 +19,12 @@ open class RxBasePresenter<V> : BasePresenter<V>() {
     private val ERROR_CONSUMER: (Throwable) -> Unit = { Functions.ERROR_CONSUMER.accept(it) }
     private val EMPTY_ACTION: Action = {}
 
-    private val handler = Handler(Looper.getMainLooper())
+    private val mainHandler = Handler(Looper.getMainLooper())
     private val activeTasks = LinkedHashMap<String, Task>()
     private val resetTaskStateActionMap = LinkedHashMap<String, Action>()
     private var isSavedState = false
-    private val detachViewActionList = mutableListOf<() -> Unit>()
+    private val onDetachViewActionList = mutableListOf<Action>()
+    private val onSaveStateActionList = mutableListOf<Action>()
 
     inner class Task(val key: String) {
         private val subTaskList = ArrayList<Disposable>()
@@ -32,7 +33,7 @@ open class RxBasePresenter<V> : BasePresenter<V>() {
         private var completable = CompletableSubject.create()
 
         fun safeAddSubTask(subTask: Disposable) {
-            handler.post { addSubTask(subTask) }
+            runOnUiThread { addSubTask(subTask) }
         }
 
         private fun addSubTask(subTask: Disposable) {
@@ -44,8 +45,7 @@ open class RxBasePresenter<V> : BasePresenter<V>() {
         }
 
         fun removeSubTask() {
-            checkMainThread("taskTracker(key) must be call after" +
-                    " observeOn(AndroidSchedulers.mainThread())")
+            checkMainThread()
             --subTaskCount
 
             if(subTaskCount == 0) {
@@ -75,6 +75,9 @@ open class RxBasePresenter<V> : BasePresenter<V>() {
 
     override fun onSaveState(savedState: Bundle) {
         super.onSaveState(savedState)
+        onSaveStateActionList.forEach { it() }
+        onSaveStateActionList.clear()
+
         savedState.putStringArrayList("task_keys", ArrayList(activeTasks.keys))
         isSavedState = true
     }
@@ -86,12 +89,13 @@ open class RxBasePresenter<V> : BasePresenter<V>() {
             val taskKeyList = savedState.getStringArrayList("task_keys")
             taskKeyList.forEach { resetTaskState(it) }
         }
+        isSavedState = false
     }
 
     override fun onDetachedView() {
         super.onDetachedView()
-        detachViewActionList.forEach { it() }
-        detachViewActionList.clear()
+        onDetachViewActionList.forEach { it() }
+        onDetachViewActionList.clear()
     }
 
     /** Preserves link for task by key while it's running  */
@@ -234,35 +238,52 @@ open class RxBasePresenter<V> : BasePresenter<V>() {
         }
     }
 
-    fun <T> Observable<T>.takeUntilDetachView(presenter: RxBasePresenter<*>): Observable<T> {
-        checkMainThread()
-        return if(presenter.view == null) {
-            takeUntil(Observable.just(Unit))
-        } else {
-            val disposeSubject = PublishSubject.create<Unit>()
-            presenter.detachViewActionList.add({
-                disposeSubject.onNext(Unit)
-            })
-            takeUntil(disposeSubject)
+    fun <T> Observable<T>.disposeOnDetachView(onSaveState: Boolean = false): Observable<T> {
+        return doOnSubscribe { disposeOnDetachView(it, onSaveState) }
+    }
+
+    fun <T> Single<T>.disposeOnDetachView(onSaveState: Boolean = false): Single<T> {
+        return doOnSubscribe { disposeOnDetachView(it, onSaveState) }
+    }
+
+    fun <T> Maybe<T>.disposeOnDetachView(onSaveState: Boolean = false): Maybe<T> {
+        return doOnSubscribe { disposeOnDetachView(it, onSaveState) }
+    }
+
+    fun Completable.disposeOnDetachView(onSaveState: Boolean = false): Completable {
+        return doOnSubscribe { disposeOnDetachView(it, onSaveState) }
+    }
+
+    private fun disposeOnDetachView(disposable: Disposable, onSaveState: Boolean) {
+        runOnUiThread {
+            if(view == null || (onSaveState && isSavedState)) {
+                disposable.dispose()
+            } else {
+                if(onSaveState) {
+                    onSaveStateActionList.add({
+                        disposable.dispose()
+                    })
+                }
+                onDetachViewActionList.add({
+                    disposable.dispose()
+                })
+            }
         }
     }
 
-    fun <T> Single<T>.takeUntilDetachView(presenter: RxBasePresenter<*>): Single<T> {
-        checkMainThread()
-        return if(presenter.view == null) {
-            takeUntil(Single.just(Unit))
-        } else {
-            val disposeSubject = PublishSubject.create<Unit>()
-            presenter.detachViewActionList.add({
-                disposeSubject.onNext(Unit)
-            })
-            takeUntil(disposeSubject.firstOrError())
-        }
-    }
-
-    fun checkMainThread(message: String = "Must be called in main thread") {
-        if(Looper.myLooper() != Looper.getMainLooper()) {
+    private fun checkMainThread(message: String = "Must be call after observeOn(AndroidSchedulers.mainThread())") {
+        if(!isMainThread()) {
             throw IllegalStateException(message)
         }
     }
+
+    private fun runOnUiThread(action: Action) {
+        if(isMainThread()) {
+            action()
+        } else {
+            mainHandler.post(action)
+        }
+    }
+
+    private fun isMainThread() = Looper.myLooper() == Looper.getMainLooper()
 }

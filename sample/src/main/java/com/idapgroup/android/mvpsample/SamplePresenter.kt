@@ -1,5 +1,6 @@
 package com.idapgroup.android.mvpsample
 
+import android.os.Bundle
 import android.util.Log
 import com.idapgroup.android.rx_mvp.RxBasePresenter
 import io.reactivex.Observable
@@ -15,9 +16,14 @@ open class SamplePresenter : SampleMvp.Presenter, RxBasePresenter<SampleMvp.View
         setResetTaskStateAction("task_confirm", { view!!.hideLoad() })
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        takeUntilDetachView("onCreate()")
+    override fun onDetachedView() {
+        super.onDetachedView()
+        Log.d(TAG, "onDetachView()")
+    }
+
+    override fun onSaveState(savedState: Bundle) {
+        super.onSaveState(savedState)
+        Log.d(TAG, "onSaveState()")
     }
 
     override fun onConfirm() {
@@ -36,14 +42,11 @@ open class SamplePresenter : SampleMvp.Presenter, RxBasePresenter<SampleMvp.View
     }
 
     override fun takeUntilDetachView() {
-        takeUntilDetachView("User action")
-    }
-
-    private fun takeUntilDetachView(tag: String) {
-        Observable.interval(4, TimeUnit.SECONDS)
+        val tag = "onDetachView"
+        Observable.interval(1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .takeUntilDetachView(this)
                 .doFinally { Log.d(TAG, "takeUntilDetachView() tag: $tag, doFinally") }
+                .disposeOnDetachView()
                 .safeSubscribe({
                     Log.d(TAG, "takeUntilDetachView() tag: $tag, onNext: $it")
                     view!!.showMessage("Tick: $it")
@@ -52,6 +55,21 @@ open class SamplePresenter : SampleMvp.Presenter, RxBasePresenter<SampleMvp.View
                     view!!.showError(it)
                 }, {
                     Log.d(TAG, "takeUntilDetachView() tag: $tag, onComplete")
+                })
+
+        val tag1 = "onSaveState"
+        Observable.interval(1, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doFinally { Log.d(TAG, "takeUntilDetachView() tag: $tag1, doFinally") }
+                .disposeOnDetachView(true)
+                .safeSubscribe({
+                    Log.d(TAG, "takeUntilDetachView() tag: $tag1, onNext: $it")
+                    view!!.showMessage("Tick: $it")
+                }, {
+                    Log.d(TAG, "takeUntilDetachView() tag: $tag1, onError: $it")
+                    view!!.showError(it)
+                }, {
+                    Log.d(TAG, "takeUntilDetachView() tag: $tag1, onComplete")
                 })
     }
 

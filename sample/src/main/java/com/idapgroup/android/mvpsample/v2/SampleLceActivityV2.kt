@@ -18,7 +18,8 @@ class SampleLceActivityV2(
 
     override fun onCreate(savedState: Bundle?) {
         super.onCreate(savedState)
-        presenter = attachPresenter(this, this, ::SampleLcePresenter, savedState, true)
+        presenter = attachPresenter(this, this, ::SampleLcePresenter,
+                savedState, false)
     }
 
     override fun onInitView() {
