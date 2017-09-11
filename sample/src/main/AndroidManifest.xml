@@ -24,6 +24,16 @@
             android:label="Presenter LCE activity"
             android:theme="@style/AppTheme" />
 
+        <activity
+            android:name=".v2.SampleActivityV2"
+            android:label="Presenter activity v2"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".v2.SampleLceActivityV2"
+            android:label="Presenter new LCE activity v2"
+            android:theme="@style/AppTheme" />
+
     </application>
 
 </manifest>

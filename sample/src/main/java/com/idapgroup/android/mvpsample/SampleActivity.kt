@@ -63,7 +63,7 @@ class SampleActivity : BasePresenterActivity<SampleMvp.View, SampleMvp.Presenter
     override fun showError(error: Throwable) {
         AlertDialog.Builder(this)
                 .setMessage(error.toString())
-                .setPositiveButton(android.R.string.ok, { dialog, i ->  })
+                .setPositiveButton(android.R.string.ok, { _, _ ->  })
                 .show()
     }
 }

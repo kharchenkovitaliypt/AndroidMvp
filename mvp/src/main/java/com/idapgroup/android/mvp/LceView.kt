@@ -1,11 +1,11 @@
 package com.idapgroup.android.mvp
 
-/** Interface representing a View with three states(loading, contentView, error)  */
-interface LceView : ErrorView {
-
-    /** Show a view with a loadView bar indicating a loading process  */
-    fun showLoad()
-
-    /** Show a view with a contentView  */
-    fun showContent()
+/** Represents view with three states(loading, contentView, error with retry)  */
+interface LceView : LcView {
+    /**
+     * Show an error message with retry ability
+     * @param errorMessage Message representing an error.
+     * @param retry Retry action
+     */
+    fun showError(errorMessage: String, retry: (() -> Unit)? = null)
 }

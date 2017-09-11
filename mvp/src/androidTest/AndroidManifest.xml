@@ -4,7 +4,17 @@
 
     <application>
         <activity
-            android:name=".impl.MockActivity"
+            android:name=".impl.TestActivity"
+            android:theme="@style/Theme.AppCompat"/>
+
+        <activity
+            android:name=".impl.ActivityResumePausePresenterViewLifecycleTest$Activity"
+            android:theme="@style/Theme.AppCompat"/>
+        <activity
+            android:name=".impl.ActivityStartStopPresenterViewLifecycleTest$Activity"
+            android:theme="@style/Theme.AppCompat"/>
+        <activity
+            android:name=".impl.ActivityCreateDestroyPresenterViewLifecycleTest$Activity"
             android:theme="@style/Theme.AppCompat"/>
     </application>
 </manifest>

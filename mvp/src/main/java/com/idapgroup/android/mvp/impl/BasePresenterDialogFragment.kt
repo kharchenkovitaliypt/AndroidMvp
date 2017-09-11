@@ -1,11 +1,8 @@
 package com.idapgroup.android.mvp.impl
 
 import android.os.Bundle
-import android.support.annotation.CallSuper
 import android.support.v4.app.DialogFragment
-import android.support.v4.app.Fragment
 import com.idapgroup.android.mvp.MvpPresenter
-import java.util.*
 
 abstract class BasePresenterDialogFragment<V, out P : MvpPresenter<V>> : DialogFragment() {
     val KEY_FRAGMENT_ID = "fragment_id"
@@ -36,18 +33,16 @@ abstract class BasePresenterDialogFragment<V, out P : MvpPresenter<V>> : DialogF
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if(savedInstanceState == null || retainedPresenterDelegates.size == 0) {
-            presenterDelegate = PresenterDelegate(onCreatePresenter())
-        } else {
+        val fragmentId = savedInstanceState?.getString(KEY_FRAGMENT_ID)
+        if(fragmentId != null && retainedPresenterDelegates.isNotEmpty()) {
             // Restore previously preserved presenter when configuration change
-            val fragmentId = savedInstanceState.getString(KEY_FRAGMENT_ID)
             @Suppress("UNCHECKED_CAST")
             presenterDelegate = retainedPresenterDelegates[fragmentId] as PresenterDelegate<V, P>
             retainedPresenterDelegates.remove(fragmentId)
+        } else {
+            presenterDelegate = PresenterDelegate(onCreatePresenter())
         }
-        if(savedInstanceState != null) {
-            presenterDelegate.onRestoreState(savedInstanceState)
-        }
+        savedInstanceState?.let { presenterDelegate.onRestoreState(it) }
         presenterDelegate.onCreate()
     }
 

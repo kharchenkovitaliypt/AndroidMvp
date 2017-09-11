@@ -43,5 +43,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp" />
+
+        <Button
+            android:id="@+id/fragment_based_v2"
+            android:text="Presenter fragment v2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" />
+
+        <Button
+            android:text="Presenter activity v2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:id="@+id/activity_based_v2" />
+
+        <Button
+            android:text="Presenter lce activity v2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:id="@+id/lce_activity_based_v2" />
     </LinearLayout>
 </FrameLayout>
