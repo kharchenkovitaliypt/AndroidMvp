@@ -238,23 +238,23 @@ open class RxBasePresenter<V> : BasePresenter<V>() {
         }
     }
 
-    fun <T> Observable<T>.disposeOnDetachView(onSaveState: Boolean = false): Observable<T> {
-        return doOnSubscribe { disposeOnDetachView(it, onSaveState) }
+    fun <T> Observable<T>.cancelOnDetachView(onSaveState: Boolean = false): Observable<T> {
+        return doOnSubscribe { cancelOnDetachView(it, onSaveState) }
     }
 
-    fun <T> Single<T>.disposeOnDetachView(onSaveState: Boolean = false): Single<T> {
-        return doOnSubscribe { disposeOnDetachView(it, onSaveState) }
+    fun <T> Single<T>.cancelOnDetachView(onSaveState: Boolean = false): Single<T> {
+        return doOnSubscribe { cancelOnDetachView(it, onSaveState) }
     }
 
-    fun <T> Maybe<T>.disposeOnDetachView(onSaveState: Boolean = false): Maybe<T> {
-        return doOnSubscribe { disposeOnDetachView(it, onSaveState) }
+    fun <T> Maybe<T>.cancelOnDetachView(onSaveState: Boolean = false): Maybe<T> {
+        return doOnSubscribe { cancelOnDetachView(it, onSaveState) }
     }
 
-    fun Completable.disposeOnDetachView(onSaveState: Boolean = false): Completable {
-        return doOnSubscribe { disposeOnDetachView(it, onSaveState) }
+    fun Completable.cancelOnDetachView(onSaveState: Boolean = false): Completable {
+        return doOnSubscribe { cancelOnDetachView(it, onSaveState) }
     }
 
-    private fun disposeOnDetachView(disposable: Disposable, onSaveState: Boolean) {
+    private fun cancelOnDetachView(disposable: Disposable, onSaveState: Boolean) {
         runOnUiThread {
             if(view == null || (onSaveState && isSavedState)) {
                 disposable.dispose()

@@ -46,7 +46,7 @@ open class SamplePresenter : SampleMvp.Presenter, RxBasePresenter<SampleMvp.View
         Observable.interval(1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally { Log.d(TAG, "takeUntilDetachView() tag: $tag, doFinally") }
-                .disposeOnDetachView()
+                .cancelOnDetachView()
                 .safeSubscribe({
                     Log.d(TAG, "takeUntilDetachView() tag: $tag, onNext: $it")
                     view!!.showMessage("Tick: $it")
@@ -55,21 +55,6 @@ open class SamplePresenter : SampleMvp.Presenter, RxBasePresenter<SampleMvp.View
                     view!!.showError(it)
                 }, {
                     Log.d(TAG, "takeUntilDetachView() tag: $tag, onComplete")
-                })
-
-        val tag1 = "onSaveState"
-        Observable.interval(1, TimeUnit.SECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doFinally { Log.d(TAG, "takeUntilDetachView() tag: $tag1, doFinally") }
-                .disposeOnDetachView(true)
-                .safeSubscribe({
-                    Log.d(TAG, "takeUntilDetachView() tag: $tag1, onNext: $it")
-                    view!!.showMessage("Tick: $it")
-                }, {
-                    Log.d(TAG, "takeUntilDetachView() tag: $tag1, onError: $it")
-                    view!!.showError(it)
-                }, {
-                    Log.d(TAG, "takeUntilDetachView() tag: $tag1, onComplete")
                 })
     }
 
