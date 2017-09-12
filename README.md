@@ -12,6 +12,7 @@ class SampleActivity : AppCompatActivity() {
 	    presenter.submit()
 	}
         ... init view ...
+
 	val createPresenter = { SamplePresenter() }
         presenter = attachPresenter(this, presenterView, createPresenter, savedState)
 	...
