@@ -1,12 +1,12 @@
 # AndroidMvp
 ```
 allprojects {
-	repositories {
-		...
-		maven { url 'https://jitpack.io' }
-	}
+    repositories {
+	...
+	maven { url 'https://jitpack.io' }
+    }
 }
 dependencies {
-     compile 'com.github.kharchenkovitaliypt.AndroidMvp:mvp:0.9.8'
+    compile 'com.github.kharchenkovitaliypt.AndroidMvp:mvp:0.9.8'
 }
 ```
