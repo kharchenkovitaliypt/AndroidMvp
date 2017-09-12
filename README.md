@@ -1,6 +1,6 @@
 # AndroidMvp
 User case:
-```
+```kotlin
 class SampleActivity : AppCompatActivity() {
 
     val presenterView<SampleMvp.View> =  ...
@@ -18,7 +18,7 @@ class SampleActivity : AppCompatActivity() {
 	...
 ```
 
-```
+```gradle
 allprojects {
     repositories {
 	...
