@@ -24,7 +24,7 @@ class LceViewHandler (
                 createErrorView: ViewCreator = Layout.CREATE_ERROR_VIEW
     ): this(SimpleLceViewCreator(createContentView, createLoadView, createErrorView))
 
-    var rawErrorConverter: ((error: Throwable) -> String)? = null
+    var errorConverter: ((error: Throwable) -> String)? = null
 
     var loadView: View? = null
         private set
@@ -108,8 +108,8 @@ class LceViewHandler (
 
     /** Show error view  */
     override fun showError(error: Throwable, retry: (() -> Unit)?) {
-        val errorMessage = if(rawErrorConverter != null) {
-            rawErrorConverter!!.invoke(error)
+        val errorMessage = if(errorConverter != null) {
+            errorConverter!!.invoke(error)
         } else {
             error.message ?: error.toString()
         }

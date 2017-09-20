@@ -6,11 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import com.idapgroup.android.mvp.LceView
 import com.idapgroup.android.mvp.MvpPresenter
+import com.idapgroup.android.mvp.RawLceView
 
 /** Fragment for displaying loading states(load, content, error)  */
 abstract class LcePresenterFragment<V, out P : MvpPresenter<V>> :
         BasePresenterFragment<V, P>(),
-        LceView{
+        LceView, RawLceView {
 
     protected val lceViewHandler = LceViewHandler()
 
@@ -35,6 +36,10 @@ abstract class LcePresenterFragment<V, out P : MvpPresenter<V>> :
 
     override fun showContent() {
         lceViewHandler.showContent()
+    }
+
+    override fun showError(error: Throwable, retry: (() -> Unit)?) {
+        lceViewHandler.showError(error, retry)
     }
 
     override fun showError(errorMessage: String, retry : (() -> Unit)?) {
