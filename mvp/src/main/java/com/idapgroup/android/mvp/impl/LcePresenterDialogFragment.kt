@@ -1,7 +1,6 @@
 package com.idapgroup.android.mvp.impl
 
 import android.os.Bundle
-import android.support.annotation.CallSuper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,9 +14,9 @@ abstract class LcePresenterDialogFragment<V, out P : MvpPresenter<V>> :
 
     protected val lceViewHandler = LceViewHandler()
 
-    open val lceViewCreator: LceViewCreator = DefaultLceViewCreator { inflater, container ->
+    open val lceViewCreator: LceViewCreator = SimpleLceViewCreator({ inflater, container ->
         onCreateContentView(inflater, container)
-    }
+    })
 
     abstract fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
 

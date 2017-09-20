@@ -3,7 +3,7 @@ package com.idapgroup.android.mvpsample.v2
 import android.os.Bundle
 import com.idapgroup.android.mvp.RawLceView
 import com.idapgroup.android.mvp.impl.LceViewHandler
-import com.idapgroup.android.mvp.impl.createLceViewCreator
+import com.idapgroup.android.mvp.impl.SimpleLceViewCreator
 import com.idapgroup.android.mvp.impl.setContentView
 import com.idapgroup.android.mvp.impl.v2.attachPresenter
 import com.idapgroup.android.mvpsample.R
@@ -23,6 +23,6 @@ class SampleLceActivityV2(
     }
 
     override fun onInitView() {
-        setContentView(lceViewHandler, createLceViewCreator(R.layout.screen_sample))
+        setContentView(lceViewHandler, SimpleLceViewCreator(R.layout.screen_sample))
     }
 }

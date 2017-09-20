@@ -14,9 +14,9 @@ abstract class LcePresenterActivity<V, out P : MvpPresenter<V>> :
 
     protected val lceViewHandler = LceViewHandler()
 
-    open val lceViewCreator: LceViewCreator = DefaultLceViewCreator {
-        inflater, container -> onCreateContentView(inflater, container)
-    }
+    open val lceViewCreator: LceViewCreator = SimpleLceViewCreator({ inflater, container ->
+        onCreateContentView(inflater, container)
+    })
 
     abstract fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
 

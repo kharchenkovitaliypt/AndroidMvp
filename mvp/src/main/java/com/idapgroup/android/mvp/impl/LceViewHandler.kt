@@ -9,7 +9,7 @@ import android.widget.TextView
 import com.idapgroup.android.mvp.LceView
 import com.idapgroup.android.mvp.R
 import com.idapgroup.android.mvp.RawLceView
-import com.idapgroup.android.mvp.impl.DefaultLceViewCreator.Layout
+import com.idapgroup.android.mvp.impl.SimpleLceViewCreator.Layout
 
 private val CONTAINER_LAYOUT_RES = R.layout.lce_base_container
 
@@ -17,12 +17,14 @@ class LceViewHandler (
         var lceViewCreator: LceViewCreator? = null
 ) : LceView, RawLceView {
 
-    constructor(@LayoutRes contentLayoutRes: Int): this(createViewCreator(contentLayoutRes))
+    constructor(@LayoutRes contentLayoutRes: Int): this(SimpleLceViewCreator(contentLayoutRes))
 
     constructor(createContentView: ViewCreator,
                 createLoadView: ViewCreator = Layout.CREATE_LOAD_VIEW,
                 createErrorView: ViewCreator = Layout.CREATE_ERROR_VIEW
     ): this(SimpleLceViewCreator(createContentView, createLoadView, createErrorView))
+
+    var rawErrorConverter: ((error: Throwable) -> String)? = null
 
     var loadView: View? = null
         private set
@@ -106,7 +108,12 @@ class LceViewHandler (
 
     /** Show error view  */
     override fun showError(error: Throwable, retry: (() -> Unit)?) {
-        showError(error.message ?: error.toString(), retry)
+        val errorMessage = if(rawErrorConverter != null) {
+            rawErrorConverter!!.invoke(error)
+        } else {
+            error.message ?: error.toString()
+        }
+        showError(errorMessage, retry)
     }
 
     /** Show error view  */
