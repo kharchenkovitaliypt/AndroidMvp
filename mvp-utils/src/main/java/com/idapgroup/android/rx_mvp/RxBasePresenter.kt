@@ -196,6 +196,14 @@ open class RxBasePresenter<V> : BasePresenter<V>() {
         return subscribe(safeOnItem(onNext), safeOnError(onError), safeOnComplete(onComplete))
     }
 
+    fun <T> Flowable<T>.safeSubscribe(
+            onNext: (T) -> Unit,
+            onError: (Throwable) -> Unit = ERROR_CONSUMER,
+            onComplete: Action = EMPTY_ACTION
+    ): Disposable {
+        return subscribe(safeOnItem(onNext), safeOnError(onError), safeOnComplete(onComplete))
+    }
+
     fun <T> Single<T>.safeSubscribe(
             onSuccess: (T) -> Unit,
             onError: (Throwable) -> Unit = ERROR_CONSUMER
@@ -240,6 +248,15 @@ open class RxBasePresenter<V> : BasePresenter<V>() {
 
     fun <T> Observable<T>.cancelOnDetachView(onSaveState: Boolean = false): Observable<T> {
         return doOnSubscribe { cancelOnDetachView(it, onSaveState) }
+    }
+
+    fun <T> Flowable<T>.cancelOnDetachView(onSaveState: Boolean = false): Flowable<T> {
+        return doOnSubscribe {
+            cancelOnDetachView(object : Disposable {
+                override fun isDisposed() = throw RuntimeException("Unsupported")
+                override fun dispose() = it.cancel()
+            }, onSaveState)
+        }
     }
 
     fun <T> Single<T>.cancelOnDetachView(onSaveState: Boolean = false): Single<T> {
