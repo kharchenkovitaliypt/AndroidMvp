@@ -12,7 +12,7 @@ import com.idapgroup.android.mvp.BuildConfig
 import com.idapgroup.android.mvp.MvpPresenter
 import com.idapgroup.android.mvp.impl.v2.LifecyclePair.*
 
-var MVP_STRICT_MODE = false
+var mvpStrictMode = false
 var defaultLifecyclePair = LifecyclePair.START_STOP
 
 enum class LifecyclePair {
@@ -20,8 +20,7 @@ enum class LifecyclePair {
 }
 
 @JvmOverloads
-fun <V, P: MvpPresenter<V>> attachPresenter(
-        activity: Activity,
+fun <V, P: MvpPresenter<V>> Activity.attachPresenter(
         view: V,
         createPresenter: () -> P,
         savedState: Bundle? = null,
@@ -29,14 +28,13 @@ fun <V, P: MvpPresenter<V>> attachPresenter(
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = defaultLifecyclePair
 ): P {
-    return attachPresenterDelegate(activity, view, createPresenter,
+    return attachPresenterDelegate(view, createPresenter,
             savedState, retain, manualHandleView, lifecyclePair
     ).presenter
 }
 
 @JvmOverloads
-fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
-        activity: Activity,
+fun <V, P: MvpPresenter<V>> Activity.attachPresenterDelegate(
         view: V,
         createPresenter: () -> P,
         savedState: Bundle? = null,
@@ -45,7 +43,7 @@ fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
         lifecyclePair: LifecyclePair = defaultLifecyclePair
 ): PresenterDelegate<V, P> {
 
-    val retainedId: String = activity.javaClass.name + activity.hashCode()
+    val retainedId: String = javaClass.name + hashCode()
     val delegate = PresenterDelegateImpl(createPresenter, savedState, retain, retainedId)
 
     if(!manualHandleView && lifecyclePair === CREATE_DESTROY_VIEW) {
@@ -84,13 +82,12 @@ fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
             }
         }
     }
-    activity.application.registerActivityLifecycleCallbacks(lifecycleCallbacks.filter(activity))
+    application.registerActivityLifecycleCallbacks(lifecycleCallbacks.filter(this))
     return  PresenterDelegateChecker(delegate, manualHandleView)
 }
 
 @JvmOverloads
-fun <V, P: MvpPresenter<V>> attachPresenter(
-        fragment: Fragment,
+fun <V, P: MvpPresenter<V>> Fragment.attachPresenter(
         view: V,
         createPresenter: () -> P,
         savedState: Bundle? = null,
@@ -98,14 +95,13 @@ fun <V, P: MvpPresenter<V>> attachPresenter(
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = defaultLifecyclePair
 ): P {
-    return attachPresenterDelegate(fragment, view, createPresenter,
+    return attachPresenterDelegate(view, createPresenter,
             savedState, retain, manualHandleView, lifecyclePair
     ).presenter
 }
 
 @JvmOverloads
-fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
-        fragment: Fragment,
+fun <V, P: MvpPresenter<V>> Fragment.attachPresenterDelegate(
         view: V,
         createPresenter: () -> P,
         savedState: Bundle? = null,
@@ -113,11 +109,11 @@ fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = defaultLifecyclePair
 ): PresenterDelegate<V, P> {
-    fragment.getPresenterDelegate<V, P>(view)?.let {
+    getPresenterDelegate<V, P>(view)?.let {
         return it
     }
 
-    val retainedId = fragment.javaClass.name + fragment.hashCode()
+    val retainedId = javaClass.name + hashCode()
     val delegate = PresenterDelegateImpl(createPresenter, savedState, retain, retainedId)
 
     val callbacks = object : FragmentLifecycleCallbacks() {
@@ -156,7 +152,7 @@ fun <V, P: MvpPresenter<V>> attachPresenterDelegate(
             }
         }
     }
-    fragment.attachPresenterDelegate(delegate, view, callbacks.filter(fragment))
+    attachPresenterDelegate(delegate, view, callbacks.filter(this))
 
     return PresenterDelegateChecker(delegate, manualHandleView)
 }
@@ -193,16 +189,16 @@ private val Fragment.presenterInfoList: MutableList<PresenterDelegateInfo<*>>
         return fragment.list
     }
 
-fun detachPresenterByView(fragment: Fragment, view: Any) {
-    fragment.detachPresenterDelegate { it.view === view }
+fun Fragment.detachPresenterByView(view: Any) {
+    detachPresenterDelegate { it.view === view }
 }
 
-fun detachPresenter(fragment: Fragment, presenter: MvpPresenter<*>) {
-    fragment.detachPresenterDelegate { it.delegate.presenter === presenter }
+fun Fragment.detachPresenter(presenter: MvpPresenter<*>) {
+    detachPresenterDelegate { it.delegate.presenter === presenter }
 }
 
-fun detachPresenterDelegate(fragment: Fragment, delegate: PresenterDelegate<*, *>) {
-    fragment.detachPresenterDelegate { it.delegate === delegate }
+fun Fragment.detachPresenterDelegate(delegate: PresenterDelegate<*, *>) {
+    detachPresenterDelegate { it.delegate === delegate }
 }
 
 internal class PresenterInfoListFragment : Fragment() {

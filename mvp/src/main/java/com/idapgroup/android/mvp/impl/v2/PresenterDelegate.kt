@@ -65,7 +65,7 @@ internal class PresenterDelegateImpl<V, out P : MvpPresenter<V>>(
 
     override fun attachView(view: V) {
         if(this.view != null) {
-            if(MVP_STRICT_MODE) {
+            if(mvpStrictMode) {
                 throw IllegalStateException("${this.view} is already attached")
             } else {
                 Log.e("Presenter", "MvpPresenter.attachView() ${this.view} is attached")
@@ -79,7 +79,7 @@ internal class PresenterDelegateImpl<V, out P : MvpPresenter<V>>(
 
     override fun detachView() {
         if(view == null) {
-            if(MVP_STRICT_MODE) {
+            if(mvpStrictMode) {
                 throw IllegalStateException("$view is detached")
             } else {
                 Log.e("Presenter", "MvpPresenter.detachView() $view is detached")

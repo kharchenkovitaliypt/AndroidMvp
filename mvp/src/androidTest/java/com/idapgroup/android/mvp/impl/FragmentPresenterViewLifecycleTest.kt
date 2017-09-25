@@ -57,7 +57,7 @@ class FragmentPresenterViewLifecycleTest {
                 restored = savedState != null
             } }
             presenter = attachPresenter(
-                    this, mvpView, createPresenter, savedState, false, lifecyclePair = LifecyclePair.RESUME_PAUSE)
+                    mvpView, createPresenter, savedState, false, lifecyclePair = LifecyclePair.RESUME_PAUSE)
             assertFalse(presenter.isAttachedView)
         }
 
@@ -94,7 +94,7 @@ class FragmentPresenterViewLifecycleTest {
                 restored = savedState != null
             } }
             presenter = attachPresenter(
-                    this, mvpView, createPresenter, savedState, false, lifecyclePair = LifecyclePair.START_STOP)
+                    mvpView, createPresenter, savedState, false, lifecyclePair = LifecyclePair.START_STOP)
         }
 
         override fun onStart() {
@@ -135,7 +135,7 @@ class FragmentPresenterViewLifecycleTest {
                 restored = savedState != null
             } }
             presenter = attachPresenter(
-                    this, mvpView, createPresenter, savedState, false, lifecyclePair = LifecyclePair.CREATE_DESTROY_VIEW)
+                    mvpView, createPresenter, savedState, false, lifecyclePair = LifecyclePair.CREATE_DESTROY_VIEW)
         }
 
         override fun onStart() {

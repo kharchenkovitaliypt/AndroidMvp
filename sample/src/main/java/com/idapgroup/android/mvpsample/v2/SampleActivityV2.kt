@@ -30,7 +30,7 @@ open class SampleActivityV2 : AppCompatActivity() {
             presenter.takeUntilDetachView()
         }
 
-        presenter = attachPresenter(this, presenterView, ::SamplePresenter, savedState, true)
+        presenter = attachPresenter(presenterView, ::SamplePresenter, savedState, true)
 
         savedState?.let {
             if(it.getBoolean("load_dialog_shown", false)) {

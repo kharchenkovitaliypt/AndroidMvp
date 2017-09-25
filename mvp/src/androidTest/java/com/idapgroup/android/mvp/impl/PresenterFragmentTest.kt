@@ -99,7 +99,7 @@ class PresenterFragmentTest {
 
         override fun onCreate(savedState: Bundle?) {
             super.onCreate(savedState)
-            p = attachPresenter(this, this, { presenter!! }, savedState, true)
+            p = attachPresenter(this, { presenter!! }, savedState, true)
         }
     }
 
@@ -121,10 +121,10 @@ class PresenterFragmentTest {
 
         override fun onCreate(savedState: Bundle?) {
             super.onCreate(savedState)
-            p = attachPresenter(this, this, ::TestPresenter)
-            val p2 = attachPresenter(this, this, ::TestPresenter)
+            p = attachPresenter(this, ::TestPresenter)
+            val p2 = attachPresenter(this, ::TestPresenter)
             assertTrue(p === p2)
-            val p3 = attachPresenter(this, this, ::TestPresenter)
+            val p3 = attachPresenter(this, ::TestPresenter)
             assertTrue(p === p3)
         }
     }
@@ -135,20 +135,20 @@ class PresenterFragmentTest {
 
         override fun onCreate(savedState: Bundle?) {
             super.onCreate(savedState)
-            p = attachPresenter(this, this, ::TestPresenter)
-            val p2 = attachPresenter(this, this, ::TestPresenter)
+            p = attachPresenter(this, ::TestPresenter)
+            val p2 = attachPresenter(this, ::TestPresenter)
             assertTrue(p === p2)
 
-            detachPresenter(this, p2)
-            val p3 = attachPresenter(this, this, ::TestPresenter)
+            detachPresenter(p2)
+            val p3 = attachPresenter(this, ::TestPresenter)
             assertFalse(p === p3)
-            val p4 = attachPresenter(this, this, ::TestPresenter)
+            val p4 = attachPresenter(this, ::TestPresenter)
             assertTrue(p3 === p4)
 
-            detachPresenterByView(this, this)
-            val p5 = attachPresenter(this, this, ::TestPresenter)
+            detachPresenterByView(this)
+            val p5 = attachPresenter(this, ::TestPresenter)
             assertFalse(p4 === p5)
-            val p6 = attachPresenter(this, this, ::TestPresenter)
+            val p6 = attachPresenter(this, ::TestPresenter)
             assertTrue(p5 === p6)
         }
     }
