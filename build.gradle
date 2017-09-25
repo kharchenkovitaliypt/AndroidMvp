@@ -2,7 +2,7 @@
 
 buildscript {
     ext.artifactGroupId = 'com.idapgroup.android'
-    ext.kotlin_version = '1.1.4-3'
+    ext.kotlin_version = '1.1.50'
     ext.dokka_version = '0.9.13'
     repositories {
         jcenter()

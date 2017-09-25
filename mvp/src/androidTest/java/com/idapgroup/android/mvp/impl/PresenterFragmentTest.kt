@@ -5,7 +5,11 @@ import android.support.test.rule.ActivityTestRule
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.idapgroup.android.mvp.impl.v2.attachPresenter
+import com.idapgroup.android.mvp.impl.v2.detachPresenter
+import com.idapgroup.android.mvp.impl.v2.detachPresenterByView
 import com.idapgroup.android.mvp.impl.v2.retainedPresenters
+import junit.framework.Assert.assertFalse
+import junit.framework.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -96,6 +100,56 @@ class PresenterFragmentTest {
         override fun onCreate(savedState: Bundle?) {
             super.onCreate(savedState)
             p = attachPresenter(this, this, { presenter!! }, savedState, true)
+        }
+    }
+
+    @Test fun testMultiAttachFragmentPresenter() {
+        waitForIdleSyncAfter {
+            activity.addFragment(TestMultiAttachFragment())
+        }
+    }
+
+    @Test fun testDetachFragmentPresenter() {
+        waitForIdleSyncAfter {
+            activity.addFragment(TestDetachPresenterFragment())
+        }
+    }
+
+    class TestMultiAttachFragment: Fragment(), TestMvpView {
+
+        private lateinit var p: TestPresenter
+
+        override fun onCreate(savedState: Bundle?) {
+            super.onCreate(savedState)
+            p = attachPresenter(this, this, ::TestPresenter)
+            val p2 = attachPresenter(this, this, ::TestPresenter)
+            assertTrue(p === p2)
+            val p3 = attachPresenter(this, this, ::TestPresenter)
+            assertTrue(p === p3)
+        }
+    }
+
+    class TestDetachPresenterFragment: Fragment(), TestMvpView {
+
+        private lateinit var p: TestPresenter
+
+        override fun onCreate(savedState: Bundle?) {
+            super.onCreate(savedState)
+            p = attachPresenter(this, this, ::TestPresenter)
+            val p2 = attachPresenter(this, this, ::TestPresenter)
+            assertTrue(p === p2)
+
+            detachPresenter(this, p2)
+            val p3 = attachPresenter(this, this, ::TestPresenter)
+            assertFalse(p === p3)
+            val p4 = attachPresenter(this, this, ::TestPresenter)
+            assertTrue(p3 === p4)
+
+            detachPresenterByView(this, this)
+            val p5 = attachPresenter(this, this, ::TestPresenter)
+            assertFalse(p4 === p5)
+            val p6 = attachPresenter(this, this, ::TestPresenter)
+            assertTrue(p5 === p6)
         }
     }
 }

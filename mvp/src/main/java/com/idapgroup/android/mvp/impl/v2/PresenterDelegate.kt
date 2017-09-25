@@ -18,7 +18,7 @@ interface PresenterDelegate<in V, out P : MvpPresenter<V>> {
 
 internal class PresenterDelegateImpl<V, out P : MvpPresenter<V>>(
         createPresenter : () -> P,
-        savedState: Bundle? = null,
+        savedState: Bundle?,
         private val retain: Boolean = false,
         private val retainId: String? = null
 ) : PresenterDelegate<V, P> {
