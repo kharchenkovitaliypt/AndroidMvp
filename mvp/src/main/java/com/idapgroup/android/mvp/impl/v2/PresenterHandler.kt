@@ -23,7 +23,7 @@ enum class LifecyclePair {
 fun <V, P: MvpPresenter<V>> Activity.attachPresenter(
         view: V,
         createPresenter: () -> P,
-        savedState: Bundle? = null,
+        savedState: Bundle?,
         retain: Boolean = false,
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = defaultLifecyclePair
@@ -37,7 +37,7 @@ fun <V, P: MvpPresenter<V>> Activity.attachPresenter(
 fun <V, P: MvpPresenter<V>> Activity.attachPresenterDelegate(
         view: V,
         createPresenter: () -> P,
-        savedState: Bundle? = null,
+        savedState: Bundle?,
         retain: Boolean = false,
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = defaultLifecyclePair
@@ -90,7 +90,7 @@ fun <V, P: MvpPresenter<V>> Activity.attachPresenterDelegate(
 fun <V, P: MvpPresenter<V>> Fragment.attachPresenter(
         view: V,
         createPresenter: () -> P,
-        savedState: Bundle? = null,
+        savedState: Bundle?,
         retain: Boolean = false,
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = defaultLifecyclePair
@@ -104,7 +104,7 @@ fun <V, P: MvpPresenter<V>> Fragment.attachPresenter(
 fun <V, P: MvpPresenter<V>> Fragment.attachPresenterDelegate(
         view: V,
         createPresenter: () -> P,
-        savedState: Bundle? = null,
+        savedState: Bundle?,
         retain: Boolean = false,
         manualHandleView: Boolean = false,
         lifecyclePair: LifecyclePair = defaultLifecyclePair

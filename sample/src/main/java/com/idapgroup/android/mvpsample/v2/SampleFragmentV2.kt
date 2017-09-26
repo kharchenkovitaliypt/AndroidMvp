@@ -29,7 +29,7 @@ class SampleFragmentV2 : SampleMvp.View, Fragment() {
         }
         view.findViewById(R.id.confirm).setOnClickListener { presenter.onConfirm() }
 
-        presenter = attachPresenter(this, ::SamplePresenter)
+        presenter = attachPresenter(this, ::SamplePresenter, savedInstanceState)
     }
 
     override fun goToMain() {

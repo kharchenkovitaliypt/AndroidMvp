@@ -121,10 +121,10 @@ class PresenterFragmentTest {
 
         override fun onCreate(savedState: Bundle?) {
             super.onCreate(savedState)
-            p = attachPresenter(this, ::TestPresenter)
-            val p2 = attachPresenter(this, ::TestPresenter)
+            p = attachPresenter(this, ::TestPresenter, savedState)
+            val p2 = attachPresenter(this, ::TestPresenter, savedState)
             assertTrue(p === p2)
-            val p3 = attachPresenter(this, ::TestPresenter)
+            val p3 = attachPresenter(this, ::TestPresenter, savedState)
             assertTrue(p === p3)
         }
     }
@@ -135,20 +135,20 @@ class PresenterFragmentTest {
 
         override fun onCreate(savedState: Bundle?) {
             super.onCreate(savedState)
-            p = attachPresenter(this, ::TestPresenter)
-            val p2 = attachPresenter(this, ::TestPresenter)
+            p = attachPresenter(this, ::TestPresenter, savedState)
+            val p2 = attachPresenter(this, ::TestPresenter, savedState)
             assertTrue(p === p2)
 
             detachPresenter(p2)
-            val p3 = attachPresenter(this, ::TestPresenter)
+            val p3 = attachPresenter(this, ::TestPresenter, savedState)
             assertFalse(p === p3)
-            val p4 = attachPresenter(this, ::TestPresenter)
+            val p4 = attachPresenter(this, ::TestPresenter, savedState)
             assertTrue(p3 === p4)
 
             detachPresenterByView(this)
-            val p5 = attachPresenter(this, ::TestPresenter)
+            val p5 = attachPresenter(this, ::TestPresenter, savedState)
             assertFalse(p4 === p5)
-            val p6 = attachPresenter(this, ::TestPresenter)
+            val p6 = attachPresenter(this, ::TestPresenter, savedState)
             assertTrue(p5 === p6)
         }
     }
